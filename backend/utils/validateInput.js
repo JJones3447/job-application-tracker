@@ -9,7 +9,7 @@ function isValidDateTime(dateStr) {
   return !isNaN(date.getTime()) && isoRegex.test(dateStr);
 }
 
-export function validateJobInput(job) {
+function validateJobInput(job) {
   const errors = [];
 
   const trimmedFields = [
@@ -76,7 +76,7 @@ export function validateJobInput(job) {
   return { valid: errors.length === 0, errors };
 }
 
-export function validateInterviewInput(interview) {
+function validateInterviewInput(interview) {
   const errors = [];
 
   if (!interview.interviewDate || !isValidDateTime(interview.interviewDate)) {
@@ -99,3 +99,42 @@ export function validateInterviewInput(interview) {
 
   return { valid: errors.length === 0, errors };
 }
+
+function validateRegisterInput(data) {
+  const errors = [];
+
+  if (!data.name || typeof data.name !== 'string' || data.name.trim().length === 0) {
+    errors.push('Name is required and must be a non-empty string.');
+  }
+
+  if (!data.email || typeof data.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.push('Valid email is required.');
+  }
+
+  if (!data.password || typeof data.password !== 'string' || data.password.length < 6) {
+    errors.push('Password is required and must be at least 6 characters long.');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+ function validateLoginInput(data = {}) {
+  const errors = [];
+
+  if (!data.email || typeof data.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.push('Valid email is required.');
+  }
+
+  if (!data.password || typeof data.password !== 'string' || data.password.length === 0) {
+    errors.push('Password is required.');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+module.exports = {
+  validateJobInput,
+  validateInterviewInput,
+  validateRegisterInput,
+  validateLoginInput
+};

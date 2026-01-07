@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const protect = require('../middleware/protect');
 const {
   getAllInterviews,
   getInterviewById,
@@ -7,6 +8,8 @@ const {
   deleteInterview,
 } = require('../controllers/interviewController');
 const {validateInterview} = require('../middleware/validateInput');
+
+router.use(protect);
 
 router.route('/')
   .get(getAllInterviews);

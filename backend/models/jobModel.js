@@ -1,41 +1,52 @@
 const pool = require('../config/db');
 
-const getAllJobs = async () => {
-    const [rows] = await pool.query('SELECT * FROM Job ORDER BY applicationDate DESC');
+const getAllJobs = async (userID) => {
+    const [rows] = await pool.query('SELECT * FROM Job WHERE userID = ? ORDER BY applicationDate DESC',
+      [userID]
+    );
     return rows;
 };
 
-const getJobById = async (jobID) => {
-    const [rows] = await pool.query('SELECT * FROM Job WHERE jobID = ?', [jobID]);
+const getJobById = async (jobID, userID) => {
+    const [rows] = await pool.query('SELECT * FROM Job WHERE jobID = ? AND userID = ?', [jobID, userID]);
     return rows[0];
 };
 
 const createJob = async (jobData) => {
-    const {companyName, jobTitle, listedSalary, location, technologies, jobURL, applicationDate, status, notes} = jobData;
-    const [result] = await pool.query(
-        `Insert INTO Job (companyName, jobTitle, listedSalary, location, technologies, jobURL, applicationDate, status, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [companyName, jobTitle, listedSalary, location, technologies, jobURL, applicationDate, status, notes]
-    );
-    return {jobID: result.insertId, ...jobData};
+  const {
+    userID, companyName, jobTitle, listedSalary, location, technologies,
+    jobURL, applicationDate, status, notes} = jobData;
+  const [result] = await pool.query(
+    `INSERT INTO Job (userID, companyName, jobTitle, listedSalary, location,
+    technologies, jobURL, applicationDate, status, notes)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [userID, companyName, jobTitle, listedSalary, location, technologies,
+      jobURL, applicationDate, status, notes]
+  );
+  return {
+    jobID: result.insertId, userID, companyName, jobTitle,
+    listedSalary, location, technologies, jobURL, applicationDate, status, notes
+  };
 };
 
-const updateJob = async (jobID, jobData) => {
+const updateJob = async (jobID, userID, jobData) => {
   const { companyName, jobTitle, listedSalary, location, technologies, jobURL, applicationDate, status, notes } = jobData;
 
-  await pool.query(
-    `UPDATE Job 
-     SET companyName = ?, jobTitle = ?, listedSalary = ?, location = ?, technologies = ?, 
+  const [result] = await pool.query(
+    `UPDATE Job
+     SET companyName = ?, jobTitle = ?, listedSalary = ?, location = ?, technologies = ?,
          jobURL = ?, applicationDate = ?, status = ?, notes = ?
-     WHERE jobID = ?`,
-    [companyName, jobTitle, listedSalary, location, technologies, jobURL, applicationDate, status, notes, jobID]
+     WHERE jobID = ? AND userID = ?`,
+    [
+      companyName, jobTitle, listedSalary, location, technologies,
+      jobURL, applicationDate, status, notes, jobID, userID]
   );
 
-  return { jobID, ...jobData };
+  return { jobID, userID, ...jobData };
 };
 
-const deleteJob = async (jobID) => {
-  await pool.query('DELETE FROM Job WHERE jobID = ?', [jobID]);
+const deleteJob = async (jobID, userID) => {
+  await pool.query('DELETE FROM Job WHERE jobID = ? AND userID = ?', [jobID, userID]);
   return { message: `Job with ID ${jobID} deleted successfully.` };
 };
 
