@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
     };
 
     next();
-  } catch (err) {
+  } catch (error) {
     return next(new AppError('Invalid or expired token', 401));
   }
 };
