@@ -11,7 +11,7 @@ const request = async (endpoint, method = 'GET', body = null) => {
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
-
+  console.log(`[API Request] ${method} ${endpoint}`, body ? body : '');
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     method,
     headers,
@@ -19,6 +19,7 @@ const request = async (endpoint, method = 'GET', body = null) => {
   });
 
   const data = await res.json();
+  console.log(`[API Response] ${method} ${endpoint}`, data);
 
   if (!res.ok) {
     throw new Error(data.message || 'Something went wrong');
