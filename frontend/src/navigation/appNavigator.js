@@ -26,7 +26,7 @@ export default function AppNavigator() {
         {userToken ? (
           <>
             <Stack.Screen name="Jobs" component={JobsScreen} />
-            <Stack.Screen name="JobDetails" component={JobDetailsScreen} />
+            <Stack.Screen name="JobDetails" component={JobDetailsScreen} options={{title: 'Job Details'}} />
           </>
         ) : (
           <Stack.Screen
