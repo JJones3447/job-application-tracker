@@ -53,7 +53,7 @@ export default function JobDetailsScreen({route}){
             </Text>
             <Text>Status: {job.status}</Text>
             {job.location && <Text>Location: {job.loaction}</Text>}
-            {job.applicationDate && (<Text> Applied on: {job.applicationDate}</Text>)}
+            {job.applicationDate && (<Text>Applied on: {job.applicationDate}</Text>)}
             {job.notes && (
         <>
           <Text style={{ marginTop: 10, fontWeight: 'bold' }}>

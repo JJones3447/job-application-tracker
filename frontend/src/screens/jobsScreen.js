@@ -31,7 +31,7 @@ export default function JobsScreen({navigation}) {
   const renderJob = ({item}) => (
     <TouchableOpacity 
     onPress={() => 
-      navigation.navigate('JobDetails', {jobID: item.jobID})
+      navigation.navigate('Job Details', {jobID: item.jobID})
     }
     style={{padding: 12, borderBottomWidth: 1}}
     >
