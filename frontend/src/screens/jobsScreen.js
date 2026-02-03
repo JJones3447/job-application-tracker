@@ -1,6 +1,7 @@
-import { View, Text, Button, FlatList, TouchableOpacity, ActivityIndicator,
-  Alert } from 'react-native';
-import { useContext, useEffect, useState } from 'react';
+import {View, Text, Button, FlatList, TouchableOpacity, ActivityIndicator,
+  Alert} from 'react-native';
+import { useContext, useEffect, useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../context/authContext';
 import api from '../services/api';
 
@@ -24,9 +25,11 @@ export default function JobsScreen({navigation}) {
     }
   };
 
-  useEffect(() => {
-    loadJobs();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadJobs();
+    }, [])
+  );
 
   const renderJob = ({item}) => (
     <TouchableOpacity 
@@ -50,6 +53,9 @@ export default function JobsScreen({navigation}) {
   }
   return (
     <View style={{flex: 1}}>
+      <View style={{padding: 10}}>
+        <Button title="Add Job" onPress={() => navigation.navigate('CreateJob')} />
+      </View>
       <FlatList
         data={jobs} keyExtractor={(item) => item.jobID.toString()}
         renderItem={renderJob}
