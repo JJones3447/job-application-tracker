@@ -29,10 +29,10 @@ export default function JobsScreen({navigation}) {
   }, []);
 
   const renderJob = ({item}) => (
-    <TouchableOpacity onPress={() => {
-      // Still need navigation
-      console.log('Selected jobID: ', item.jobID);
-    }}
+    <TouchableOpacity 
+    onPress={() => 
+      navigation.navigate('JobDetails', {jobID: item.jobID})
+    }
     style={{padding: 12, borderBottomWidth: 1}}
     >
       <Text>{item.companyName}</Text>

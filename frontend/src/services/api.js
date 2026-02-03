@@ -43,6 +43,9 @@ export default {
   getJobs: () =>
     request('/api/jobs'),
 
+  getJob: (jobID) =>
+    request(`/api/jobs/${jobID}`),
+
   createJob: (job) =>
     request('/api/jobs', 'POST', job),
 

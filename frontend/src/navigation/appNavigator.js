@@ -5,6 +5,7 @@ import { View, ActivityIndicator } from 'react-native';
 
 import LoginScreen from '../screens/loginScreen';
 import JobsScreen from '../screens/jobsScreen';
+import JobDetailsScreen from '../screens/jobDetailsScreen';
 import { AuthContext } from '../context/authContext';
 
 const Stack = createNativeStackNavigator();
@@ -22,9 +23,18 @@ export default function AppNavigator() {
   return(
     <NavigationContainer>
       <Stack.Navigator>
-        {userToken ? (<Stack.Screen name="Jobs" component={JobsScreen}/>)
-        : (<Stack.Screen
-          name="Login" component={LoginScreen} options={{headerShown: false}}/>)}
+        {userToken ? (
+          <>
+            <Stack.Screen name="Jobs" component={JobsScreen} />
+            <Stack.Screen name="JobDetails" component={JobDetailsScreen} />
+          </>
+        ) : (
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
