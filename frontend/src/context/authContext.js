@@ -18,10 +18,21 @@ export function AuthProvider({children}){
     };
     const checkAuth = async () => {
         const token = await AsyncStorage.getItem('token');
-        if (token){setUserToken(token);}
-        setLoading(false);
+        if (!token) {
+            setLoading(false);
+            return;
+        }
+        try {
+            // temporary token check, verify with a protected endpoint later
+            await api.getJobs();
+            setUserToken(token);
+        } catch {
+            await AsyncStorage.removeItem('token');
+            setUserToken(null);
+        } finally {
+            setLoading(false);
+        }
     };
-
     useEffect(() => {
         checkAuth();
     }, []);

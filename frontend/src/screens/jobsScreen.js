@@ -15,7 +15,10 @@ export default function JobsScreen({navigation}) {
       const res = await api.getJobs();
       setJobs(res.data.jobs);
     } catch (error) {
-      Alert.alert('Error: ', error.message);
+      if (error.message === 'Unauthorized') logout();
+      else {
+        Alert.alert('Error: ', error.message);
+      }
     } finally {
       setLoading(false);
     }
