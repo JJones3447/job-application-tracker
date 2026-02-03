@@ -28,7 +28,7 @@ export default function AppNavigator() {
           <>
             <Stack.Screen name="Jobs" component={JobsScreen} />
             <Stack.Screen name="JobDetails" component={JobDetailsScreen} options={{title: 'Job Details'}} />
-            <Stack.Screen name="CreateJobScreen" component={CreateJobScreen} options={{title: 'Add Job'}} />
+            <Stack.Screen name="CreateJob" component={CreateJobScreen} options={{title: 'Add Job'}} />
           </>
         ) : (
           <Stack.Screen
