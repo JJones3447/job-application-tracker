@@ -21,13 +21,11 @@ const request = async (endpoint, method = 'GET', body = null) => {
   const data = await res.json();
   console.log(`[API Response] ${method} ${endpoint}`, data);
 
-  if (res.status === 400) {
-    await AsyncStorage.removeItem('token');
-    throw new Error('Unauthorized');
-  }
-
   if (!res.ok) {
-    throw new Error(data.message || 'Something went wrong');
+    const error = new Error(data.message || 'Something went wrong');
+    error.status = res.status;
+    error.details = data.details;
+    throw error;
   }
 
   return data;

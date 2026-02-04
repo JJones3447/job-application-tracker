@@ -52,7 +52,7 @@ export default function JobDetailsScreen({route}){
                 {job.jobTitle}
             </Text>
             <Text>Status: {job.status}</Text>
-            {job.location && <Text>Location: {job.loaction}</Text>}
+            {job.location && <Text>Location: {job.location}</Text>}
             {job.applicationDate && (<Text>Applied on: {job.applicationDate}</Text>)}
             {job.notes && (
         <>

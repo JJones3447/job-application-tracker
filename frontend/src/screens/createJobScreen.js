@@ -46,10 +46,10 @@ export default function CreateJobScreen({navigation}) {
       Alert.alert('Success', 'Job created successfully!');
       navigation.goBack();
     } catch (error) {
-      if (error.details) {
-        Alert.alert('Validation Error', error.details.join('\n'));
-      } else if (error.message.toLowerCase().includes('unauthorized')) {
+      if (error.status === 401) {
         logout();
+      } else if (error.details) {
+        Alert.alert('Validation Error', error.details.join('\n'));
       } else {
         Alert.alert('Error', error.message);
       }
