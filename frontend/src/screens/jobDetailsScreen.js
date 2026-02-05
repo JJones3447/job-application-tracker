@@ -3,7 +3,7 @@ import {View, Text, ActivityIndicator, Alert, Button} from 'react-native';
 import api from '../services/api';
 import { AuthContext } from '../context/authContext';
 
-export default function JobDetailsScreen({route}){
+export default function JobDetailsScreen({route, navigation}){
     const {jobID} = route.params;
     const {logout} = useContext(AuthContext);
     const [job, setJob] = useState(null);
