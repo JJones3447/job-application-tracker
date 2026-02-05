@@ -47,6 +47,12 @@ export default {
   createJob: (job) =>
     request('/api/jobs', 'POST', job),
 
+  updateJob: (jobID, job) => 
+    request(`/api/jobs/${jobID}`, 'PUT', job),
+
+  deleteJob: (jobID) =>
+    request(`/api/jobs/${jobID}`, 'DELETE'),
+
   getInterviewsForJob: (jobID) =>
     request(`/api/jobs/${jobID}/interviews`),
 };

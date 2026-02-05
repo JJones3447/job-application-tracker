@@ -8,6 +8,7 @@ import JobsScreen from '../screens/jobsScreen';
 import JobDetailsScreen from '../screens/jobDetailsScreen';
 import CreateJobScreen from '../screens/createJobScreen';
 import { AuthContext } from '../context/authContext';
+import EditJobScreen from '../screens/editJobScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,7 @@ export default function AppNavigator() {
             <Stack.Screen name="Jobs" component={JobsScreen} />
             <Stack.Screen name="JobDetails" component={JobDetailsScreen} options={{title: 'Job Details'}} />
             <Stack.Screen name="CreateJob" component={CreateJobScreen} options={{title: 'Add Job'}} />
+            <Stack.Screen name="EditJob" component={EditJobScreen} options={{title: 'Edit Job'}} />
           </>
         ) : (
           <Stack.Screen
