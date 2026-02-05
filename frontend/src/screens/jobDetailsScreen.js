@@ -1,4 +1,4 @@
-import {useEffect, useState, useContext} from 'react';
+import {useFocusEffect, useCallback, useState, useContext} from 'react';
 import {View, Text, ActivityIndicator, Alert, Button} from 'react-native';
 import api from '../services/api';
 import { AuthContext } from '../context/authContext';
@@ -23,9 +23,11 @@ export default function JobDetailsScreen({route, navigation}){
         }
     };
 
-    useEffect(() => {
-        loadJob();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            loadJob();
+        }, [jobID])
+    );
 
     if (loading) {
         return (
