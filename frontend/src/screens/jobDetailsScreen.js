@@ -1,5 +1,5 @@
-import {useFocusEffect, useCallback, useState, useContext} from 'react';
-import {View, Text, ActivityIndicator, Alert, Button} from 'react-native';
+import {useCallback, useState, useContext} from 'react';
+import {useFocusEffect, View, Text, ActivityIndicator, Alert, Button, Platform} from 'react-native';
 import api from '../services/api';
 import { AuthContext } from '../context/authContext';
 
@@ -46,6 +46,16 @@ export default function JobDetailsScreen({route, navigation}){
     }
 
     const handleDelete = () => {
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm(
+            'Are you sure you want to delete this job? This action cannot be undone.'
+            );
+            if (confirmed) {
+            confirmDelete();
+            }
+            return;
+        }
+
         Alert.alert(
             'Delete Job',
             'Are you sure you want to delete this job? This action cannot be undone.',
@@ -58,13 +68,13 @@ export default function JobDetailsScreen({route, navigation}){
             },
             ]
         );
-        };
+    };
 
     const confirmDelete = async () => {
         try {
             await api.deleteJob(jobID);
             Alert.alert('Deleted', 'Job deleted successfully.');
-            navigation.goBack();
+            navigation.navigate('Jobs');
         } catch (error) {
             if (error.status === 401) logout();
             else Alert.alert('Error', error.message);
