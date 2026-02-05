@@ -1,5 +1,6 @@
 import {useCallback, useState, useContext} from 'react';
-import {useFocusEffect, View, Text, ActivityIndicator, Alert, Button, Platform} from 'react-native';
+import {View, Text, ActivityIndicator, Alert, Button, Platform} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import api from '../services/api';
 import { AuthContext } from '../context/authContext';
 
