@@ -8,7 +8,7 @@ export default function CreateJobScreen({ navigation }) {
   const { logout } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const initialValues = {
     companyName: '',
@@ -22,10 +22,36 @@ export default function CreateJobScreen({ navigation }) {
     notes: '',
   };
 
-  const handleCreate = async (payload) => {
+  const mapBackendErrors = (details = []) => {
+    const fieldErrors = {};
+
+    details.forEach(msg => {
+      const lower = msg.toLowerCase();
+
+      if (lower.includes('company')) {
+        fieldErrors.companyName = msg;
+      } else if (lower.includes('job title')) {
+        fieldErrors.jobTitle = msg;
+      } else if (lower.includes('salary')) {
+        fieldErrors.listedSalary = msg;
+      } else if (lower.includes('location')) {
+        fieldErrors.location = msg;
+      } else if (lower.includes('url')) {
+        fieldErrors.jobURL = msg;
+      } else if (lower.includes('status')) {
+        fieldErrors.status = msg;
+      } else {
+        fieldErrors.general = msg;
+      }
+    });
+
+    return fieldErrors;
+  };
+
+  const handleCreate = async payload => {
     try {
       setLoading(true);
-      setError(null);
+      setErrors({});
 
       await api.createJob(payload);
 
@@ -37,9 +63,9 @@ export default function CreateJobScreen({ navigation }) {
       }
 
       if (err.details?.length) {
-        setError(err.details.join('\n'));
+        setErrors(mapBackendErrors(err.details));
       } else {
-        setError(err.message || 'Something went wrong');
+        setErrors({ general: err.message || 'Something went wrong' });
       }
     } finally {
       setLoading(false);
@@ -53,7 +79,7 @@ export default function CreateJobScreen({ navigation }) {
         onSubmit={handleCreate}
         submitLabel="Create Job"
         loading={loading}
-        error={error}
+        errors={errors}
       />
     </View>
   );

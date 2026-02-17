@@ -11,7 +11,7 @@ export default function EditJobScreen({ route, navigation }) {
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     loadJob();
@@ -41,16 +41,42 @@ export default function EditJobScreen({ route, navigation }) {
         return;
       }
 
-      setError(err.message || 'Failed to load job.');
+      setErrors({ general: err.message || 'Failed to load job.' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async (payload) => {
+  const mapBackendErrors = details => {
+    const fieldErrors = {};
+
+    details.forEach(msg => {
+      const lower = msg.toLowerCase();
+
+      if (lower.includes('company')) {
+        fieldErrors.companyName = msg;
+      } else if (lower.includes('job title')) {
+        fieldErrors.jobTitle = msg;
+      } else if (lower.includes('salary')) {
+        fieldErrors.listedSalary = msg;
+      } else if (lower.includes('location')) {
+        fieldErrors.location = msg;
+      } else if (lower.includes('url')) {
+        fieldErrors.jobURL = msg;
+      } else if (lower.includes('status')) {
+        fieldErrors.status = msg;
+      } else {
+        fieldErrors.general = msg;
+      }
+    });
+
+    return fieldErrors;
+  };
+
+  const handleSave = async payload => {
     try {
       setSaving(true);
-      setError(null);
+      setErrors({});
 
       await api.updateJob(jobID, payload);
 
@@ -62,9 +88,9 @@ export default function EditJobScreen({ route, navigation }) {
       }
 
       if (err.details?.length) {
-        setError(err.details.join('\n'));
+        setErrors(mapBackendErrors(err.details));
       } else {
-        setError(err.message || 'Something went wrong');
+        setErrors({ general: err.message || 'Something went wrong' });
       }
     } finally {
       setSaving(false);
@@ -86,7 +112,7 @@ export default function EditJobScreen({ route, navigation }) {
         onSubmit={handleSave}
         submitLabel="Save Changes"
         loading={saving}
-        error={error}
+        errors={errors}
       />
     </View>
   );
