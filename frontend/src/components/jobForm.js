@@ -8,6 +8,7 @@ export default function JobForm({
   onSubmit,
   submitLabel = 'Submit',
   loading = false,
+  error = null,
 }) {
   const [formData, setFormData] = useState(initialValues);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -126,6 +127,11 @@ export default function JobForm({
         onChangeText={text => handleChange('notes', text)}
         multiline
       />
+      {error && (
+        <View style={{ marginBottom: 10 }}>
+          <Text style={{ color: 'red' }}>{error}</Text>
+        </View>
+      )}
       <Button
         title={loading ? 'Saving…' : submitLabel}
         onPress={handleSubmit}

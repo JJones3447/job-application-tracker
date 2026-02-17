@@ -38,6 +38,9 @@ export default {
   register: (data) =>
     request('/authentication/register', 'POST', data),
 
+  getMe: () =>
+  request('/authentication/me'),
+
   getJobs: () =>
     request('/api/jobs'),
 

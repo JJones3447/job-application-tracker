@@ -5,5 +5,11 @@ const { validateRegister, validateLogin } = require('../middleware/validateInput
 
 router.post('/register', validateRegister, register);
 router.post('/login', validateLogin, login);
+router.get('/me', protect, (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    data: { user: req.user }
+  });
+});
 
 module.exports = router;

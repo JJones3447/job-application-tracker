@@ -23,8 +23,7 @@ export function AuthProvider({children}){
             return;
         }
         try {
-            // temporary token check, verify with a protected endpoint later
-            await api.getJobs();
+            await api.getMe();
             setUserToken(token);
         } catch {
             await AsyncStorage.removeItem('token');
