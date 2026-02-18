@@ -16,10 +16,6 @@ export default function JobsScreen({navigation}) {
       const res = await api.getJobs();
       setJobs(res.data.jobs);
     } catch (error) {
-      if (error.message === 401) logout();
-      else {
-        Alert.alert('Error: ', error.message);
-      }
     } finally {
       setLoading(false);
     }

@@ -15,10 +15,6 @@ export default function JobDetailsScreen({route, navigation}){
             const res = await api.getJob(jobID);
             setJob(res.data.job);
         } catch (error){
-            if (error.message === '401') logout();
-            else {
-                Alert.alert('Error', error.message);
-            }
         } finally {
             setLoading(false);
         }

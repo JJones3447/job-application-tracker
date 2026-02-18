@@ -57,11 +57,6 @@ export default function EditJobScreen({ route, navigation }) {
 
       navigation.goBack();
     } catch (err) {
-      if (err.status === 401) {
-        logout();
-        return;
-      }
-
       if (err.details?.length) {
         setErrors(mapBackendErrors(err.details));
       } else {
