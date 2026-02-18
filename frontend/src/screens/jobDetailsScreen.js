@@ -3,6 +3,7 @@ import {View, Text, ActivityIndicator, Alert, Button, Platform} from 'react-nati
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../services/api';
 import { AuthContext } from '../context/authContext';
+import Toast from 'react-native-toast-message';
 
 export default function JobDetailsScreen({route, navigation}){
     const {jobID} = route.params;
@@ -70,7 +71,10 @@ export default function JobDetailsScreen({route, navigation}){
     const confirmDelete = async () => {
         try {
             await api.deleteJob(jobID);
-            Alert.alert('Deleted', 'Job deleted successfully.');
+            Toast.show({
+              type: 'success',
+              text1: 'Job Deleted',
+            });
             navigation.navigate('Jobs');
         } catch (error) {
             if (error.status === 401) logout();
