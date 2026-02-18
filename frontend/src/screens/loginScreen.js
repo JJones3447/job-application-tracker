@@ -7,18 +7,16 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
+    
     try {
       setLoading(true);
+      setErrorMessage('');
       await login(email, password);
     } catch (error) {
-      Alert.alert('Login failed', error.message);
+      setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -39,6 +37,11 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         secureTextEntry
       />
+      {errorMessage ? (
+        <Text style={{ color: 'red', marginTop: 8 }}>
+          {errorMessage}
+        </Text>
+      ) : null}
       <Button
         title={loading ? 'Logging in...' : 'Login'}
         onPress={handleLogin}

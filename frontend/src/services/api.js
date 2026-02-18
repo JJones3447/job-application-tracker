@@ -37,8 +37,9 @@ const request = async (endpoint, method = 'GET', body = null) => {
       logoutHandler();
     }
 
-    const error = new Error(data.message || 'Something went wrong');
+    const error = new Error(data.error?.message || 'Something went wrong');
     error.status = res.status;
+    error.type = data.error?.type;
     error.details = data.details;
 
     throw error;
