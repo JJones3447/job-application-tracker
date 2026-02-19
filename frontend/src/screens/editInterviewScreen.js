@@ -1,13 +1,13 @@
 import { useEffect, useState, useContext } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import api from '../services/api';
-import { AuthContext } from '../context/authContext';
-import JobForm from '../components/jobForm';
-import mapBackendErrors from '../utils/mapBackendErrors';
+import InterviewForm from '../components/interviewForm';
+import mapInterviewErrors from '../utils/mapInterviewErrors';
 import Toast from 'react-native-toast-message';
+import { AuthContext } from '../context/authContext';
 
-export default function EditJobScreen({ route, navigation }) {
-  const { jobID } = route.params;
+export default function EditInterviewScreen({ route, navigation }) {
+  const { interviewID } = route.params;
   const { logout } = useContext(AuthContext);
 
   const [formData, setFormData] = useState(null);
@@ -16,32 +16,31 @@ export default function EditJobScreen({ route, navigation }) {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    loadJob();
+    loadInterview();
   }, []);
 
-  const loadJob = async () => {
+  const loadInterview = async () => {
     try {
-      const res = await api.getJob(jobID);
-      const job = res.data.job;
+      const res = await api.getInterview(interviewID);
+      const interview = res.data.interview;
+
       setFormData({
-        companyName: job.companyName ?? '',
-        jobTitle: job.jobTitle ?? '',
-        listedSalary: job.listedSalary ?? '',
-        location: job.location ?? '',
-        technologies: job.technologies ?? '',
-        jobURL: job.jobURL ?? '',
-        applicationDate: job.applicationDate
-          ? new Date(job.applicationDate)
+        interviewDate: interview.interviewDate
+          ? new Date(interview.interviewDate)
           : new Date(),
-        status: job.status ?? 'Applied',
-        notes: job.notes ?? '',
+        interviewType: interview.interviewType ?? 'Phone',
+        result: interview.result ?? 'Pending',
+        interviewNotes: interview.interviewNotes ?? '',
       });
     } catch (err) {
       if (err.status === 401) {
         logout();
         return;
       }
-      setErrors({ general: err.message || 'Failed to load job.' });
+
+      setErrors({
+        general: err.message || 'Failed to load interview.',
+      });
     } finally {
       setLoading(false);
     }
@@ -51,22 +50,32 @@ export default function EditJobScreen({ route, navigation }) {
     try {
       setSaving(true);
       setErrors({});
-      await api.updateJob(jobID, payload);
+
+      await api.updateInterview(interviewID, payload);
+
       Toast.show({
         type: 'success',
-        text1: 'Job Updated',
+        text1: 'Interview Updated',
       });
+
       navigation.goBack();
     } catch (error) {
+      if (error.status === 401) {
+        logout();
+        return;
+      }
       if (error.details?.length) {
-        setErrors(mapBackendErrors(error.details));
+        setErrors(mapInterviewErrors(error.details));
       } else {
-        setErrors({ general: error.message || 'Something went wrong' });
+        setErrors({
+          general: error.message || 'Something went wrong',
+        });
       }
     } finally {
       setSaving(false);
     }
   };
+
   if (loading || !formData) {
     return (
       <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -77,7 +86,7 @@ export default function EditJobScreen({ route, navigation }) {
 
   return (
     <View style={{ flex: 1 }}>
-      <JobForm
+      <InterviewForm
         initialValues={formData}
         onSubmit={handleSave}
         submitLabel="Save Changes"

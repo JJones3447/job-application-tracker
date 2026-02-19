@@ -36,11 +36,11 @@ export default function CreateJobScreen({ navigation }) {
         text2: 'Your job was added successfully.',
       });
       navigation.goBack();
-    } catch (err) {
-      if (err.details?.length) {
-        setErrors(mapBackendErrors(err.details));
+    } catch (error) {
+      if (error.details?.length) {
+        setErrors(mapBackendErrors(error.details));
       } else {
-        setErrors({ general: err.message || 'Something went wrong' });
+        setErrors({ general: error.message || 'Something went wrong' });
       }
     } finally {
       setLoading(false);

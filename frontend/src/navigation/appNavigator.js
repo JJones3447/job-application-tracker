@@ -10,6 +10,10 @@ import CreateJobScreen from '../screens/createJobScreen';
 import { AuthContext } from '../context/authContext';
 import EditJobScreen from '../screens/editJobScreen';
 import RegisterScreen from '../screens/registerScreen';
+import InterviewsScreen from '../screens/interviewsScreen';
+import InterviewDetailsScreen from '../screens/interviewDetailsScreen';
+import CreateInterviewScreen from '../screens/createInterviewScreen';
+import EditInterviewScreen from '../screens/editInterviewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,19 +36,15 @@ export default function AppNavigator() {
             <Stack.Screen name="JobDetails" component={JobDetailsScreen} options={{title: 'Job Details'}} />
             <Stack.Screen name="CreateJob" component={CreateJobScreen} options={{title: 'Add Job'}} />
             <Stack.Screen name="EditJob" component={EditJobScreen} options={{title: 'Edit Job'}} />
+            <Stack.Screen name="Interviews" component={InterviewsScreen} options={{title: 'All Interviews'}} />
+            <Stack.Screen name="InterviewDetails" component={InterviewDetailsScreen} options={{title: 'Interview Details'}} />
+            <Stack.Screen name="CreateInterview" component={CreateInterviewScreen} options={{title: 'Add Interview'}} />
+            <Stack.Screen name="EditInterview" component={EditInterviewScreen} options={{title: 'Edit Interview'}} />
           </>
         ) : (
           <>
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            options={{title: 'Create Account'}}
-          />
+          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Register" component={RegisterScreen} options={{title: 'Create Account'}} />
           </>
         )}
       </Stack.Navigator>

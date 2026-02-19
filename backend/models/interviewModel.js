@@ -1,7 +1,7 @@
 const pool = require('../config/db');
 
 const getAllInterviews = async (userID, filters = {}) => {
-  let query = 'SELECT i.* FROM Interview i JOIN Job j ON i.jobID = j.jobID WHERE j.userID = ? ';
+  let query = 'SELECT i.*, j.companyName, j.jobTitle FROM Interview i JOIN Job j ON i.jobID = j.jobID WHERE j.userID = ? ';
   const params = [userID];
 
   if (filters.result) {
@@ -21,14 +21,14 @@ const getAllInterviews = async (userID, filters = {}) => {
 
 const getInterviewsByJobId = async (jobID, userID) => {
   const [rows] = await pool.query(
-    'SELECT i.* FROM Interview i JOIN Job j on i.jobID = j.jobID WHERE i.jobID = ? AND j.userID = ? ORDER BY i.interviewDate DESC',
+    'SELECT i.*, j.companyName, j.jobTitle FROM Interview i JOIN Job j on i.jobID = j.jobID WHERE i.jobID = ? AND j.userID = ? ORDER BY i.interviewDate DESC',
     [jobID, userID]
   );
   return rows;
 };
 
 const getInterviewById = async (interviewID, userID) => {
-  const [rows] = await pool.query('SELECT i.* FROM Interview i JOIN Job j ON i.jobID = j.jobID WHERE i.interviewID = ? AND j.userID = ?',
+  const [rows] = await pool.query('SELECT i.*, j.companyName, j.jobTitle FROM Interview i JOIN Job j ON i.jobID = j.jobID WHERE i.interviewID = ? AND j.userID = ?',
      [interviewID, userID]);
   return rows[0];
 };

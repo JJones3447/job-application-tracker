@@ -80,4 +80,19 @@ export default {
 
   getInterviewsForJob: jobID =>
     request(`/api/jobs/${jobID}/interviews`),
+
+  getInterviews: () =>
+    request('/api/interviews'),
+
+  getInterview: interviewID =>
+    request(`/api/interviews/${interviewID}`),
+
+  createInterviewForJob: (jobID, interview) =>
+    request(`/api/jobs/${jobID}/interviews`, 'POST', interview),
+
+  updateInterview: (interviewID, interview) =>
+    request(`/api/interviews/${interviewID}`, 'PUT', interview),
+
+  deleteInterview: interviewID =>
+    request(`/api/interviews/${interviewID}`, 'DELETE'),
 };
