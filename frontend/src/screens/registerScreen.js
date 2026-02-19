@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import {useState, useContext} from 'react';
 import { View } from 'react-native';
 import api from '../services/api';
 import AuthForm from '../components/authForm';
 import mapAuthErrors from '../utils/mapAuthErrors';
+import { AuthContext } from '../context/authContext';
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen() {
+  const {login} = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -18,7 +20,7 @@ export default function RegisterScreen({ navigation }) {
       setLoading(true);
       setErrors({});
       await api.register(formData);
-      navigation.navigate('Login');
+      await login(formData.email, formData.password);
     } catch (err) {
       if (err.details?.length) {
         setErrors(mapAuthErrors(err.details));

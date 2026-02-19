@@ -1,10 +1,10 @@
 import { useState, useContext } from 'react';
-import { View } from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 import { AuthContext } from '../context/authContext';
 import AuthForm from '../components/authForm';
 import mapAuthErrors from '../utils/mapAuthErrors';
 
-export default function LoginScreen() {
+export default function LoginScreen({navigation}) {
   const { login } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(false);
@@ -40,6 +40,15 @@ export default function LoginScreen() {
         loading={loading}
         errors={errors}
       />
+      <View style={{ alignItems: 'center', marginTop: 20 }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={{ color: 'blue' }}>
+            Don’t have an account? Register
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
