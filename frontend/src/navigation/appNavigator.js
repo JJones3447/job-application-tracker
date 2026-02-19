@@ -9,6 +9,7 @@ import JobDetailsScreen from '../screens/jobDetailsScreen';
 import CreateJobScreen from '../screens/createJobScreen';
 import { AuthContext } from '../context/authContext';
 import EditJobScreen from '../screens/editJobScreen';
+import RegisterScreen from '../screens/registerScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,11 +34,18 @@ export default function AppNavigator() {
             <Stack.Screen name="EditJob" component={EditJobScreen} options={{title: 'Edit Job'}} />
           </>
         ) : (
+          <>
           <Stack.Screen
             name="Login"
             component={LoginScreen}
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{title: 'Create Account'}}
+          />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>

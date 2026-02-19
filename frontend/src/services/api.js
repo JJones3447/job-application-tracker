@@ -27,7 +27,12 @@ const request = async (endpoint, method = 'GET', body = null) => {
     body: body ? JSON.stringify(body) : null,
   });
 
-  const data = await res.json();
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    data = {};
+  }
 
   console.log(`[API Response] ${method} ${endpoint}`, data);
 
@@ -40,7 +45,7 @@ const request = async (endpoint, method = 'GET', body = null) => {
     const error = new Error(data.error?.message || 'Something went wrong');
     error.status = res.status;
     error.type = data.error?.type;
-    error.details = data.details;
+    error.details = data.error?.details;
 
     throw error;
   }

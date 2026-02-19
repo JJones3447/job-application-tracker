@@ -1,25 +1,24 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { View } from 'react-native';
-import { AuthContext } from '../context/authContext';
+import api from '../services/api';
 import AuthForm from '../components/authForm';
 import mapAuthErrors from '../utils/mapAuthErrors';
 
-export default function LoginScreen() {
-  const { login } = useContext(AuthContext);
-
+export default function RegisterScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const initialValues = {
+    name: '',
     email: '',
     password: '',
   };
-
-  const handleLogin = async formData => {
+  const handleRegister = async formData => {
     try {
       setLoading(true);
       setErrors({});
-      await login(formData.email, formData.password);
+      await api.register(formData);
+      navigation.navigate('Login');
     } catch (err) {
       if (err.details?.length) {
         setErrors(mapAuthErrors(err.details));
@@ -30,15 +29,15 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
-
   return (
     <View style={{ flex: 1 }}>
       <AuthForm
         initialValues={initialValues}
-        onSubmit={handleLogin}
-        submitLabel="Login"
+        onSubmit={handleRegister}
+        submitLabel="Register"
         loading={loading}
         errors={errors}
+        isRegister
       />
     </View>
   );
