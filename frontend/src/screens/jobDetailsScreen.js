@@ -113,17 +113,29 @@ export default function JobDetailsScreen({ route, navigation }) {
         </Text>
         <Text>Status: {job.status}</Text>
         {job.location && <Text>Location: {job.location}</Text>}
+        <Text>Listed Salary: {job.listedSalary || '-'}</Text>
+        {job.technologies && <Text>Technologies: {job.technologies}</Text>}
+        {job.jobURL && (
+          <Text>
+            Job URL:{' '}
+            <Text
+              style={{ color: 'blue' }}
+              onPress={() => {
+                if (Platform.OS === 'web') window.open(job.jobURL, '_blank');
+              }}
+            >
+              {job.jobURL}
+            </Text>
+          </Text>
+        )}
         {job.applicationDate && (
           <Text>
-            Applied on:{' '}
-            {new Date(job.applicationDate).toDateString()}
+            Applied on: {new Date(job.applicationDate).toDateString()}
           </Text>
         )}
         {job.notes && (
           <>
-            <Text style={{ marginTop: 10, fontWeight: 'bold' }}>
-              Notes
-            </Text>
+            <Text style={{ marginTop: 10, fontWeight: 'bold' }}>Notes</Text>
             <Text>{job.notes}</Text>
           </>
         )}
