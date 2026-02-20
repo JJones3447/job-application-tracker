@@ -1,5 +1,5 @@
-import {useCallback, useState, useContext} from 'react';
 import {View, Text, ActivityIndicator, Alert, Button, Platform, FlatList, TouchableOpacity} from 'react-native';
+import { useCallback, useState, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../services/api';
 import { AuthContext } from '../context/authContext';
@@ -16,10 +16,8 @@ export default function JobDetailsScreen({ route, navigation }) {
   const loadData = async () => {
     try {
       setLoading(true);
-
       const jobRes = await api.getJob(jobID);
       setJob(jobRes.data.job);
-
       const interviewRes = await api.getInterviewsForJob(jobID);
       setInterviews(interviewRes.data.interviews);
     } catch (error) {
@@ -37,12 +35,16 @@ export default function JobDetailsScreen({ route, navigation }) {
 
   const handleDelete = () => {
     if (Platform.OS === 'web') {
-      if (window.confirm('Delete this job?')) confirmDelete();
+      const confirmed = window.confirm(
+        'Are you sure you want to delete this job? This action cannot be undone.'
+      );
+      if (confirmed) confirmDelete();
       return;
     }
+
     Alert.alert(
       'Delete Job',
-      'Are you sure?',
+      'Are you sure you want to delete this job? This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Delete', style: 'destructive', onPress: confirmDelete },
@@ -60,6 +62,7 @@ export default function JobDetailsScreen({ route, navigation }) {
       navigation.navigate('Jobs');
     } catch (error) {
       if (error.status === 401) logout();
+      else Alert.alert('Error', error.message);
     }
   };
 
@@ -109,19 +112,28 @@ export default function JobDetailsScreen({ route, navigation }) {
           {job.jobTitle}
         </Text>
         <Text>Status: {job.status}</Text>
+        {job.location && <Text>Location: {job.location}</Text>}
         {job.applicationDate && (
           <Text>
             Applied on:{' '}
             {new Date(job.applicationDate).toDateString()}
           </Text>
         )}
-        <View style={{ marginTop: 20 }}>
+        {job.notes && (
+          <>
+            <Text style={{ marginTop: 10, fontWeight: 'bold' }}>
+              Notes
+            </Text>
+            <Text>{job.notes}</Text>
+          </>
+        )}
+        <View style={{ marginTop: 25 }}>
           <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
             Interviews
           </Text>
           <FlatList
             data={interviews}
-            keyExtractor={item =>
+            keyExtractor={(item) =>
               item.interviewID.toString()
             }
             renderItem={renderInterview}
@@ -155,12 +167,6 @@ export default function JobDetailsScreen({ route, navigation }) {
             title="Delete Job"
             color="red"
             onPress={handleDelete}
-          />
-        </View>
-        <View style={{ marginTop: 10 }}>
-          <Button
-            title="View All Interviews"
-            onPress={() => navigation.navigate('Interviews')}
           />
         </View>
       </View>
