@@ -65,7 +65,7 @@ export default function InterviewForm({
   const normalizePayload = () => {
     return {
       ...formData,
-      interviewDate: formData.interviewDate.toISOString(),
+      interviewDate: formData.interviewDate.toISOString().split('.')[0] + 'Z',
     };
   };
 
@@ -100,12 +100,35 @@ export default function InterviewForm({
     <ScrollView contentContainerStyle={{ padding: 20 }}>
       <Text>Interview Date *</Text>
       {Platform.OS === 'web' ? (
-        <TextInput
-          value={formData.interviewDate.toISOString()}
-          onChangeText={text =>
-            handleChange('interviewDate', new Date(text))
-          }
-        />
+        <>
+          <Text>Date</Text>
+          <TextInput
+            type="date"
+            value={formData.interviewDate.toISOString().split('T')[0]}
+            onChange={e => {
+              const date = e.target.value;
+              const current = formData.interviewDate;
+              const newDate = new Date(
+                `${date}T${current.toTimeString().split(' ')[0]}`
+              );
+              handleChange('interviewDate', newDate);
+            }}
+          />
+          <Text>Time</Text>
+          <TextInput
+            type="time"
+            value={formData.interviewDate
+              .toTimeString()
+              .slice(0, 5)}
+            onChange={e => {
+              const time = e.target.value;
+              const current = formData.interviewDate;
+              const datePart = current.toISOString().split('T')[0];
+              const newDate = new Date(`${datePart}T${time}:00`);
+              handleChange('interviewDate', newDate);
+            }}
+          />
+        </>
       ) : (
         <>
           <Button
