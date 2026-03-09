@@ -1,129 +1,74 @@
-import { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, ScrollView, ActivityIndicator, Platform} from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import useFormValidation from '../hooks/useFormValidation';
-import FormField from '../components/formField';
+import React, { useState } from 'react';
+import { View, Button } from 'react-native';
+import FormField from './formField';
 
-const InterviewForm = ({ onSubmit, initialValues = {} }) => {
-  const isEditing = !!initialValues.interviewID;
+const pad = (n) => String(n).padStart(2, '0');
 
-  const initialState = {
-    interviewDate: initialValues.interviewDate
-      ? new Date(initialValues.interviewDate)
-      : new Date(),
-    dateString: '',
-    timeString: '',
-    interviewType: initialValues.interviewType || '',
+const formatLocalDateTime = (date) => {
+  return (
+    date.getFullYear() +
+    '-' +
+    pad(date.getMonth() + 1) +
+    '-' +
+    pad(date.getDate()) +
+    'T' +
+    pad(date.getHours()) +
+    ':' +
+    pad(date.getMinutes()) +
+    ':' +
+    pad(date.getSeconds())
+  );
+};
+
+const InterviewForm = ({ onSubmit, initialValues = {}, submitLabel }) => {
+  const [formData, setFormData] = useState({
+    interviewDate: initialValues.interviewDate || '',
+    interviewType: initialValues.interviewType || 'Phone',
     interviewNotes: initialValues.interviewNotes || '',
-    result: initialValues.result || '',
+    result: initialValues.result || 'Pending',
+  });
+
+  const updateField = (field, value) => {
+    setFormData({ ...formData, [field]: value });
   };
 
-  const requiredFields =
-    Platform.OS === 'web'
-      ? ['interviewType', 'dateString', 'timeString', 'result']
-      : ['interviewType', 'result'];
+  const handleSubmit = () => {
+    const finalDate = new Date(formData.interviewDate);
 
-  const {
-    formData,
-    setFormData,
-    handleChange,
-    handleBlur,
-    validateForm,
-    shouldShowError,
-  } = useFormValidation(initialState, requiredFields);
-
-  const [showPicker, setShowPicker] = useState(false);
-
-  useEffect(() => {
-    if (Platform.OS === 'web') {
-      const baseDate = formData.interviewDate;
-
-      setFormData(prev => ({
-        ...prev,
-        dateString: baseDate.toISOString().split('T')[0],
-        timeString: baseDate.toTimeString().slice(0, 5),
-      }));
-    }
-  }, []);
-
-  const normalizePayload = () => {
-    const finalDate =
-      Platform.OS === 'web'
-        ? new Date(`${formData.dateString}T${formData.timeString}:00`)
-        : formData.interviewDate;
-
-    return {
-      interviewDate:
-        finalDate.toISOString().split('.')[0] + 'Z',
+    const payload = {
+      interviewDate: formatLocalDateTime(finalDate),
       interviewType: formData.interviewType,
       interviewNotes: formData.interviewNotes,
       result: formData.result,
     };
-  };
 
-  const handleSubmit = () => {
-    if (!validateForm()) return;
-    onSubmit(normalizePayload());
+    onSubmit(payload);
   };
 
   return (
-    <View style={{ padding: 16 }}>
+    <View>
+      <FormField
+        label="Interview Date (YYYY-MM-DDTHH:MM)"
+        value={formData.interviewDate}
+        onChange={(text) => updateField('interviewDate', text)}
+      />
       <FormField
         label="Interview Type"
         value={formData.interviewType}
-        onChange={text => handleChange('interviewType', text)}
-        onBlur={() => handleBlur('interviewType')}
-        error={shouldShowError('interviewType')}
+        onChange={(text) => updateField('interviewType', text)}
       />
-      {Platform.OS === 'web' ? (
-        <>
-          <FormField
-            label="Date"
-            value={formData.dateString}
-            onChange={e => handleChange('dateString', e.target.value)}
-            onBlur={() => handleBlur('dateString')}
-            error={shouldShowError('dateString')}
-            type="date"
-          />
-          <FormField
-            label="Time"
-            value={formData.timeString}
-            onChange={e => handleChange('timeString', e.target.value)}
-            onBlur={() => handleBlur('timeString')}
-            error={shouldShowError('timeString')}
-            type="time"
-          />
-        </>
-      ) : (
-        <>
-          <Button
-            title={formData.interviewDate.toLocaleString()}
-            onPress={() => setShowPicker(true)}
-          />
-          {showPicker && (
-            <DateTimePicker
-              value={formData.interviewDate}
-              mode="datetime"
-              onChange={(event, selectedDate) => {
-                setShowPicker(false);
-                if (selectedDate)
-                  handleChange('interviewDate', selectedDate);
-              }}
-            />
-          )}
-        </>
-      )}
       <FormField
         label="Result"
         value={formData.result}
-        onChange={text => handleChange('result', text)}
-        onBlur={() => handleBlur('result')}
-        error={shouldShowError('result')}
+        onChange={(text) => updateField('result', text)}
       />
-      <Button
-        title={isEditing ? 'Update Interview' : 'Create Interview'}
-        onPress={handleSubmit}
+      <FormField
+        label="Notes"
+        value={formData.interviewNotes}
+        onChange={(text) => updateField('interviewNotes', text)}
+        multiline
       />
+      <Button title={submitLabel} onPress={handleSubmit} />
     </View>
   );
 };

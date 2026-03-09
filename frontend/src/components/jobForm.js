@@ -1,134 +1,69 @@
-import { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  ScrollView,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import useFormValidation from '../hooks/useFormValidation';
-import FormField from '../components/formField';
+import React, { useState } from 'react';
+import { View, Button, StyleSheet } from 'react-native';
+import FormField from './formField';
 
-const JobForm = ({ onSubmit, initialValues = {} }) => {
-  const isEditing = !!initialValues.jobID;
-
-  const initialState = {
+const JobForm = ({ onSubmit, initialValues = {}, submitLabel }) => {
+  const [formData, setFormData] = useState({
     companyName: initialValues.companyName || '',
     jobTitle: initialValues.jobTitle || '',
-    status: initialValues.status || '',
-    applicationDate: initialValues.applicationDate
-      ? new Date(initialValues.applicationDate)
-      : new Date(),
-    dateString: '',
-  };
+    location: initialValues.location || '',
+    salaryRange: initialValues.salaryRange || '',
+    jobDescription: initialValues.jobDescription || '',
+    applicationDate: initialValues.applicationDate || '',
+    status: initialValues.status || 'Applied',
+  });
 
-  const requiredFields =
-    Platform.OS === 'web'
-      ? ['companyName', 'jobTitle', 'dateString', 'status']
-      : ['companyName', 'jobTitle', 'status'];
-
-  const {
-    formData,
-    setFormData,
-    handleChange,
-    handleBlur,
-    validateForm,
-    shouldShowError,
-  } = useFormValidation(initialState, requiredFields);
-
-  const [showPicker, setShowPicker] = useState(false);
-
-  useEffect(() => {
-    if (Platform.OS === 'web') {
-      const baseDate = formData.applicationDate;
-
-      setFormData(prev => ({
-        ...prev,
-        dateString: baseDate.toISOString().split('T')[0],
-      }));
-    }
-  }, []);
-
-  const normalizePayload = () => {
-    const finalDate =
-      Platform.OS === 'web'
-        ? new Date(formData.dateString)
-        : formData.applicationDate;
-
-    return {
-      companyName: formData.companyName,
-      jobTitle: formData.jobTitle,
-      status: formData.status,
-      applicationDate:
-        finalDate.toISOString().split('T')[0],
-    };
+  const updateField = (field, value) => {
+    setFormData({ ...formData, [field]: value });
   };
 
   const handleSubmit = () => {
-    if (!validateForm()) return;
-    onSubmit(normalizePayload());
+    onSubmit(formData);
   };
 
   return (
-    <View style={{ padding: 16 }}>
+    <View>
       <FormField
         label="Company Name"
         value={formData.companyName}
-        onChange={text => handleChange('companyName', text)}
-        onBlur={() => handleBlur('companyName')}
-        error={shouldShowError('companyName')}
+        onChange={(text) => updateField('companyName', text)}
       />
       <FormField
         label="Job Title"
         value={formData.jobTitle}
-        onChange={text => handleChange('jobTitle', text)}
-        onBlur={() => handleBlur('jobTitle')}
-        error={shouldShowError('jobTitle')}
+        onChange={(text) => updateField('jobTitle', text)}
       />
-      {Platform.OS === 'web' ? (
-        <FormField
-          label="Application Date"
-          value={formData.dateString}
-          onChange={e => handleChange('dateString', e.target.value)}
-          onBlur={() => handleBlur('dateString')}
-          error={shouldShowError('dateString')}
-          type="date"
-        />
-      ) : (
-        <>
-          <Button
-            title={formData.applicationDate.toDateString()}
-            onPress={() => setShowPicker(true)}
-          />
-          {showPicker && (
-            <DateTimePicker
-              value={formData.applicationDate}
-              mode="date"
-              onChange={(event, selectedDate) => {
-                setShowPicker(false);
-                if (selectedDate)
-                  handleChange('applicationDate', selectedDate);
-              }}
-            />
-          )}
-        </>
-      )}
+      <FormField
+        label="Location"
+        value={formData.location}
+        onChange={(text) => updateField('location', text)}
+      />
+      <FormField
+        label="Salary Range"
+        value={formData.salaryRange}
+        onChange={(text) => updateField('salaryRange', text)}
+      />
+      <FormField
+        label="Application Date (YYYY-MM-DD)"
+        value={formData.applicationDate}
+        onChange={(text) => updateField('applicationDate', text)}
+      />
+      <FormField
+        label="Job Description"
+        value={formData.jobDescription}
+        onChange={(text) => updateField('jobDescription', text)}
+        multiline
+      />
       <FormField
         label="Status"
         value={formData.status}
-        onChange={text => handleChange('status', text)}
-        onBlur={() => handleBlur('status')}
-        error={shouldShowError('status')}
+        onChange={(text) => updateField('status', text)}
       />
-      <Button
-        title={isEditing ? 'Update Job' : 'Create Job'}
-        onPress={handleSubmit}
-      />
+      <Button title={submitLabel} onPress={handleSubmit} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({});
 
 export default JobForm;

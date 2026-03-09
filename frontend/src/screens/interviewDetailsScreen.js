@@ -12,6 +12,13 @@ export default function InterviewDetailsScreen({ route, navigation }) {
   const [interview, setInterview] = useState(null);
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  const formatDateTime = (dateString) => {
+    return new Date(dateString).toLocaleString([], {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+  };
 
   const loadInterview = async () => {
     try {
@@ -112,10 +119,7 @@ export default function InterviewDetailsScreen({ route, navigation }) {
           Interview Details
         </Text>
         <Text>
-          Date:{' '}
-          {interview.interviewDate
-            ? new Date(interview.interviewDate).toLocaleString()
-            : 'N/A'}
+          Interview Date: {formatDateTime(interview.interviewDate)}
         </Text>
         <Text>Type: {interview.interviewType}</Text>
         <Text>Result: {interview.result}</Text>

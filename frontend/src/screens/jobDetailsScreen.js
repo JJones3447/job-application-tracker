@@ -13,6 +13,12 @@ export default function JobDetailsScreen({ route, navigation }) {
   const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString([], {
+      dateStyle: 'medium',
+    });
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -130,7 +136,7 @@ export default function JobDetailsScreen({ route, navigation }) {
         )}
         {job.applicationDate && (
           <Text>
-            Applied on: {new Date(job.applicationDate).toDateString()}
+            Applied on: {formatDate(job.applicationDate)}
           </Text>
         )}
         {job.notes && (

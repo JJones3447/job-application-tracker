@@ -1,40 +1,38 @@
 import React from 'react';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 
-const FormField = ({
-  label,
-  value,
-  onChange,
-  error,
-  type = 'text',
-  multiline = false,
-}) => {
+const FormField = ({ label, value, onChange, multiline = false }) => {
   return (
-    <View style={{ marginBottom: 16 }}>
-      <Text style={{ marginBottom: 4 }}>{label}</Text>
+    <View style={styles.container}>
+      <Text style={styles.label}>{label}</Text>
 
       <TextInput
+        style={[styles.input, multiline && styles.multiline]}
         value={value}
-        onChange={onChange}
+        onChangeText={onChange}
         multiline={multiline}
-        style={{
-          borderWidth: 1,
-          borderColor: error ? 'red' : '#ccc',
-          padding: 8,
-          borderRadius: 4,
-        }}
-        {...(type === 'date' || type === 'time'
-          ? { type }
-          : {})}
       />
-
-      {error && (
-        <Text style={{ color: 'red', marginTop: 4 }}>
-          {error}
-        </Text>
-      )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 15,
+  },
+  label: {
+    marginBottom: 5,
+    fontWeight: 'bold',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+  },
+  multiline: {
+    height: 100,
+  },
+});
 
 export default FormField;
