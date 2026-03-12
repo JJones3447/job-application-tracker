@@ -50,9 +50,7 @@ export default function EditInterviewScreen({ route, navigation }) {
     try {
       setSaving(true);
       setErrors({});
-
       await updateInterview(interviewID, payload);
-
       Toast.show({
         type: 'success',
         text1: 'Interview Updated',

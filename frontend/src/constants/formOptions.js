@@ -1,16 +1,17 @@
 export const INTERVIEW_TYPES = [
   { label: 'Phone', value: 'Phone' },
-  { label: 'Video', value: 'Video' },
+  { label: 'Behavioral', value: 'Behavioral' },
   { label: 'Onsite', value: 'Onsite' },
   { label: 'Technical', value: 'Technical' },
   { label: 'HR', value: 'HR' },
+  { label: 'Other', value: 'Other'}
 ];
 
 export const INTERVIEW_RESULTS = [
   { label: 'Pending', value: 'Pending' },
   { label: 'Passed', value: 'Passed' },
-  { label: 'Rejected', value: 'Rejected' },
-  { label: 'Offer', value: 'Offer' },
+  { label: 'Failed', value: 'Failed' },
+  { label: 'Offer Extended', value: 'Offer Extended' },
 ];
 
 export const JOB_STATUS_OPTIONS = [
