@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Button, } from 'react-native';
-import {FormField, FormDatePicker, FormSelect} from '../..';
+import FormField from '../formField';
+import FormDatePicker from '../formDatePicker';
+import FormSelect from '../formSelect';
 import {
   INTERVIEW_TYPES,
   INTERVIEW_RESULTS,
