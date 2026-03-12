@@ -14,6 +14,7 @@ export default function InterviewDetailsScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   
   const formatDateTime = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleString([], {
       dateStyle: 'medium',
       timeStyle: 'short',

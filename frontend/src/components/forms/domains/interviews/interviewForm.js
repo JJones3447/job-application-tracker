@@ -13,16 +13,13 @@ import {
 
 const buildISODate = (date, hour, minute, period) => {
   let h = parseInt(hour);
-
   if (period === 'PM' && h !== 12) h += 12;
   if (period === 'AM' && h === 12) h = 0;
 
-  const finalDate = new Date(date);
-  finalDate.setHours(h);
-  finalDate.setMinutes(parseInt(minute));
-  finalDate.setSeconds(0);
+  const [year, month, day] = date.split('-').map(Number);
+  const localDate = new Date(year, month - 1, day, h, parseInt(minute), 0);  
 
-  return finalDate.toISOString();
+  return localDate.toISOString();
 };
 
 const InterviewForm = ({ onSubmit, initialValues = {}, submitLabel }) => {
