@@ -1,7 +1,7 @@
 import {useState, useContext} from 'react';
 import { View } from 'react-native';
 import { register, login } from '../api';
-import {AuthForm} from '../components/forms/';
+import AuthForm from '../components/forms/domains/auth/authForm';
 import mapAuthErrors from '../utils/mapAuthErrors';
 import { AuthContext } from '../context/authContext';
 

@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { getJob, updateJob } from '../api';
 import { AuthContext } from '../context/authContext';
-import {JobForm} from '../components/forms/';
+import JobForm from '../components/forms/domains/jobs/jobForm';
 import mapBackendErrors from '../utils/mapBackendErrors';
 import Toast from 'react-native-toast-message';
 

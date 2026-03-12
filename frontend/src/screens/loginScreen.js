@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import { AuthContext } from '../context/authContext';
-import {AuthForm} from '../components/forms/';
+import AuthForm from '../components/forms/domains/auth/authForm';
 import mapAuthErrors from '../utils/mapAuthErrors';
 
 export default function LoginScreen({navigation}) {
