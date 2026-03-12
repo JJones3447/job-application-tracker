@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Button, FormSelect } from 'react-native';
+import { View, Button } from 'react-native';
 import FormField from '../formField';
 import FormDatePicker from '../formDatePicker';
+import FormSelect from '../formSelect';
 
 const formatDate = date => {
   if (!date) return '';
