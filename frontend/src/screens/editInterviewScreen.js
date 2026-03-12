@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { getInterview, updateInterview } from '../api';
-import InterviewForm from '../components/forms/';
+import {InterviewForm} from '../components/forms/';
 import mapInterviewErrors from '../utils/mapInterviewErrors';
 import Toast from 'react-native-toast-message';
 import { AuthContext } from '../context/authContext';

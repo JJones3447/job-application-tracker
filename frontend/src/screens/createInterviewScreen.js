@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { View } from 'react-native';
 import { createInterviewForJob } from '../api';
-import InterviewForm from '../components/forms/';
+import {InterviewForm} from '../components/forms/';
 import mapInterviewErrors from '../utils/mapInterviewErrors';
 import Toast from 'react-native-toast-message';
 import { AuthContext } from '../context/authContext';
