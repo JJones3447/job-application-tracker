@@ -19,7 +19,7 @@ const buildISODate = (date, hour, minute, period) => {
   const [year, month, day] = date.split('-').map(Number);
   const localDate = new Date(year, month - 1, day, h, parseInt(minute), 0);  
 
-  return localDate.toISOString();
+  return localDate.toISOString().split('.')[0] + 'Z';
 };
 
 const InterviewForm = ({ onSubmit, initialValues = {}, submitLabel }) => {
