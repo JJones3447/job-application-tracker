@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api, {setLogoutHandler} from '../services/api';
+import {login as loginApi, getMe} from '../api/auth/authApi';
+import {setLogoutHandler} from '../api/client/client';
 
 export const AuthContext = createContext();
 
@@ -24,7 +25,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       setAuthenticating(true);
-      const data = await api.login({ email, password });
+      const data = await loginApi({ email, password });
       await AsyncStorage.setItem('token', data.token);
       setUserToken(data.token);
     } finally {
@@ -43,7 +44,7 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      await api.getMe();
+      await getMe();
       setUserToken(token);
     } catch {
       await AsyncStorage.removeItem('token');

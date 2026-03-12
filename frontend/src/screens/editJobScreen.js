@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import api from '../services/api';
+import { getJob, updateJob } from '../api';
 import { AuthContext } from '../context/authContext';
-import JobForm from '../components/jobForm';
+import JobForm from '../components/forms/';
 import mapBackendErrors from '../utils/mapBackendErrors';
 import Toast from 'react-native-toast-message';
 
@@ -21,7 +21,7 @@ export default function EditJobScreen({ route, navigation }) {
 
   const loadJob = async () => {
     try {
-      const res = await api.getJob(jobID);
+      const res = await getJob(jobID);
       const job = res.data.job;
       setFormData({
         companyName: job.companyName ?? '',
@@ -51,7 +51,7 @@ export default function EditJobScreen({ route, navigation }) {
     try {
       setSaving(true);
       setErrors({});
-      await api.updateJob(jobID, payload);
+      await updateJob(jobID, payload);
       Toast.show({
         type: 'success',
         text1: 'Job Updated',

@@ -1,7 +1,7 @@
 import {useState, useContext} from 'react';
 import { View } from 'react-native';
-import api from '../services/api';
-import AuthForm from '../components/authForm';
+import { register, login } from '../api';
+import AuthForm from '../components/forms/';
 import mapAuthErrors from '../utils/mapAuthErrors';
 import { AuthContext } from '../context/authContext';
 
@@ -19,7 +19,7 @@ export default function RegisterScreen() {
     try {
       setLoading(true);
       setErrors({});
-      await api.register(formData);
+      await register(formData);
       await login(formData.email, formData.password);
     } catch (err) {
       if (err.details?.length) {

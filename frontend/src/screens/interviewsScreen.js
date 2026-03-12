@@ -1,7 +1,7 @@
 import {View, Text, FlatList, TouchableOpacity, ActivityIndicator} from 'react-native';
 import { useState, useCallback, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import api from '../services/api';
+import { getInterviews } from '../api';
 import { AuthContext } from '../context/authContext';
 
 export default function InterviewsScreen({ navigation }) {
@@ -13,7 +13,7 @@ export default function InterviewsScreen({ navigation }) {
   const loadInterviews = async () => {
     try {
       setLoading(true);
-      const res = await api.getInterviews();
+      const res = await getInterviews();
       setInterviews(res.data.interviews);
     } catch (err) {
       if (err.status === 401) logout();

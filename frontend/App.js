@@ -11,7 +11,6 @@ function Root() {
     <>
       <AppNavigator />
       <Toast />
-
       {authenticating && (
         <View style={styles.overlay}>
           <ActivityIndicator size="large" color="#fff" />

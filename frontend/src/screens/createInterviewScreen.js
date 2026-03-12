@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { View } from 'react-native';
-import api from '../services/api';
-import InterviewForm from '../components/interviewForm';
+import { createInterviewForJob } from '../api';
+import InterviewForm from '../components/forms/';
 import mapInterviewErrors from '../utils/mapInterviewErrors';
 import Toast from 'react-native-toast-message';
 import { AuthContext } from '../context/authContext';
@@ -24,7 +24,7 @@ export default function CreateInterviewScreen({ route, navigation }) {
     try {
       setLoading(true);
       setErrors({});
-      await api.createInterviewForJob(jobID, payload);
+      await createInterviewForJob(jobID, payload);
       Toast.show({
         type: 'success',
         text1: 'Interview Created',

@@ -1,9 +1,8 @@
-import {View, Text, Button, FlatList, TouchableOpacity, ActivityIndicator,
-  Alert} from 'react-native';
-import { useContext, useEffect, useState, useCallback } from 'react';
+import {View, Text, Button, FlatList, TouchableOpacity, ActivityIndicator,} from 'react-native';
+import { useContext, useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../context/authContext';
-import api from '../services/api';
+import { getJobs } from '../api';
 
 export default function JobsScreen({navigation}) {
   const { logout } = useContext(AuthContext);
@@ -13,7 +12,7 @@ export default function JobsScreen({navigation}) {
   const loadJobs = async () => {
     try {
       setLoading(true);
-      const res = await api.getJobs();
+      const res = await getJobs();
       setJobs(res.data.jobs);
     } catch (error) {
     } finally {

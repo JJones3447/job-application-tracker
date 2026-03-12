@@ -1,8 +1,8 @@
 import { useContext, useState } from 'react';
 import { View } from 'react-native';
-import api from '../services/api';
+import { createJob } from '../api';
 import { AuthContext } from '../context/authContext';
-import JobForm from '../components/jobForm';
+import JobForm from '../components/forms/';
 import mapBackendErrors from '../utils/mapBackendErrors';
 import Toast from 'react-native-toast-message';
 
@@ -29,7 +29,7 @@ export default function CreateJobScreen({ navigation }) {
       setLoading(true);
       setErrors({});
 
-      await api.createJob(payload);
+      await createJob(payload);
       Toast.show({
         type: 'success',
         text1: 'Job Created',

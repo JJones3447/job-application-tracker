@@ -1,7 +1,7 @@
 import {View, Text, ActivityIndicator, Button, Alert, Platform} from 'react-native';
 import { useState, useCallback, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import api from '../services/api';
+import {getInterview, deleteInterview, getJob} from '../api';
 import Toast from 'react-native-toast-message';
 import { AuthContext } from '../context/authContext';
 
@@ -23,11 +23,11 @@ export default function InterviewDetailsScreen({ route, navigation }) {
   const loadInterview = async () => {
     try {
       setLoading(true);
-      const res = await api.getInterview(interviewID);
+      const res = await getInterview(interviewID);
       const interviewData = res.data.interview;
       setInterview(interviewData);
       if (interviewData?.jobID) {
-        const jobRes = await api.getJob(interviewData.jobID);
+        const jobRes = await getJob(interviewData.jobID);
         setJob(jobRes.data.job);
       }
     } catch (err) {
@@ -71,7 +71,7 @@ export default function InterviewDetailsScreen({ route, navigation }) {
 
   const confirmDelete = async () => {
     try {
-      await api.deleteInterview(interviewID);
+      await deleteInterview(interviewID);
       Toast.show({
         type: 'success',
         text1: 'Interview Deleted',

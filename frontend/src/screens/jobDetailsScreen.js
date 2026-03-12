@@ -1,7 +1,7 @@
 import {View, Text, ActivityIndicator, Alert, Button, Platform, FlatList, TouchableOpacity} from 'react-native';
 import { useCallback, useState, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import api from '../services/api';
+import {getJob, getInterviewsForJob, deleteJob} from '../api';
 import { AuthContext } from '../context/authContext';
 import Toast from 'react-native-toast-message';
 
@@ -22,9 +22,9 @@ export default function JobDetailsScreen({ route, navigation }) {
   const loadData = async () => {
     try {
       setLoading(true);
-      const jobRes = await api.getJob(jobID);
+      const jobRes = await getJob(jobID);
       setJob(jobRes.data.job);
-      const interviewRes = await api.getInterviewsForJob(jobID);
+      const interviewRes = await getInterviewsForJob(jobID);
       setInterviews(interviewRes.data.interviews);
     } catch (error) {
       if (error.status === 401) logout();
@@ -60,7 +60,7 @@ export default function JobDetailsScreen({ route, navigation }) {
 
   const confirmDelete = async () => {
     try {
-      await api.deleteJob(jobID);
+      await deleteJob(jobID);
       Toast.show({
         type: 'success',
         text1: 'Job Deleted',

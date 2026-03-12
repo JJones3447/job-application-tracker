@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import api from '../services/api';
-import InterviewForm from '../components/interviewForm';
+import { getInterview, updateInterview } from '../api';
+import InterviewForm from '../components/forms/';
 import mapInterviewErrors from '../utils/mapInterviewErrors';
 import Toast from 'react-native-toast-message';
 import { AuthContext } from '../context/authContext';
@@ -21,7 +21,7 @@ export default function EditInterviewScreen({ route, navigation }) {
 
   const loadInterview = async () => {
     try {
-      const res = await api.getInterview(interviewID);
+      const res = await getInterview(interviewID);
       const interview = res.data.interview;
 
       setFormData({
@@ -51,7 +51,7 @@ export default function EditInterviewScreen({ route, navigation }) {
       setSaving(true);
       setErrors({});
 
-      await api.updateInterview(interviewID, payload);
+      await updateInterview(interviewID, payload);
 
       Toast.show({
         type: 'success',
