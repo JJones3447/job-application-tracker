@@ -1,7 +1,7 @@
 export const INTERVIEW_TYPES = [
   { label: 'Phone', value: 'Phone' },
   { label: 'Behavioral', value: 'Behavioral' },
-  { label: 'Onsite', value: 'Onsite' },
+  { label: 'On-site', value: 'On-site' },
   { label: 'Technical', value: 'Technical' },
   { label: 'HR', value: 'HR' },
   { label: 'Other', value: 'Other'}
