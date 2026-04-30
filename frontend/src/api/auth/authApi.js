@@ -1,11 +1,10 @@
-import apiClient from '../client/client';
+import { post, get } from '../client/request';
 
-export const login = async (credentials) => {
-  const response = await apiClient.post('/authentication/login', credentials);
-  return response.data;
-};
+export const login = (credentials) =>
+  post('/authentication/login', credentials);
 
-export const register = async (userData) => {
-  const response = await apiClient.post('/authentication/register', userData);
-  return response.data;
-};
+export const register = (userData) =>
+  post('/authentication/register', userData);
+
+export const getMe = () =>
+  get('/authentication/me');

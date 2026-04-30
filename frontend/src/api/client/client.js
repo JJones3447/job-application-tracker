@@ -1,7 +1,7 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuthToken } from './tokenStorage';
 
-const API_BASE_URL = 'http://192.168.1.210:3000';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 let logoutHandler = null;
 
@@ -13,8 +13,8 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
-apiClient.interceptors.request.use(async config => {
-  const token = await AsyncStorage.getItem('token');
+apiClient.interceptors.request.use(config => {
+  const token = getAuthToken();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -26,16 +26,19 @@ apiClient.interceptors.request.use(async config => {
 apiClient.interceptors.response.use(
   response => response,
   async error => {
-    if (error.response?.status === 401 && logoutHandler) {
-      await AsyncStorage.removeItem('token');
+    const status = error.response?.status;
+    const message = error.response?.data?.error?.message;
+
+    if (
+      status === 401 &&
+      logoutHandler &&
+      message !== 'Invalid email or password'
+    ) {
       logoutHandler();
     }
 
-    const err = new Error(
-      error.response?.data?.error?.message || 'Something went wrong'
-    );
-
-    err.status = error.response?.status;
+    const err = new Error(message || 'Something went wrong');
+    err.status = status;
     err.details = error.response?.data?.error?.details;
 
     return Promise.reject(err);

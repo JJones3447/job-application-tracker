@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { View, Text, Button, Platform, TextInput } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+const formatLocalDate = (date) => {
+  if (!date) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export default function FormDatePicker({
   label,
   value,
@@ -9,15 +17,12 @@ export default function FormDatePicker({
   error,
 }) {
   const [show, setShow] = useState(false);
-  const formatDate = date => {
-    if (!date) return '';
-    return new Date(date).toISOString().split('T')[0];
-  };
 
   const handleNativeChange = (event, selectedDate) => {
     setShow(false);
+
     if (selectedDate) {
-      onChange(formatDate(selectedDate));
+      onChange(formatLocalDate(selectedDate));
     }
   };
 
@@ -28,7 +33,6 @@ export default function FormDatePicker({
           {label}
         </Text>
       )}
-
       {Platform.OS === 'web' ? (
         <TextInput
           value={value}
@@ -36,7 +40,7 @@ export default function FormDatePicker({
           onChangeText={onChange}
           style={{
             borderWidth: 1,
-            borderColor: '#ccc',
+            borderColor: error ? 'red' : '#ccc',
             padding: 10,
             borderRadius: 5,
           }}
@@ -47,7 +51,6 @@ export default function FormDatePicker({
             title={value || 'Select Date'}
             onPress={() => setShow(true)}
           />
-
           {show && (
             <DateTimePicker
               value={value ? new Date(value) : new Date()}

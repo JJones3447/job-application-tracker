@@ -1,16 +1,34 @@
-import { useContext, useState } from 'react';
 import { View } from 'react-native';
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createJob } from '../api';
-import { AuthContext } from '../context/authContext';
 import JobForm from '../components/forms/domains/jobs/jobForm';
 import mapBackendErrors from '../utils/mapBackendErrors';
+import handleApiError from '../utils/handleApiError';
 import Toast from 'react-native-toast-message';
+import { queryKeys } from '../api/queryKeys';
+import { getTodayString } from '../utils/dateUtils';
 
 export default function CreateJobScreen({ navigation }) {
-  const { logout } = useContext(AuthContext);
-
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const queryClient = useQueryClient();
+
+  const createJobMutation = useMutation({
+    mutationFn: createJob,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs });
+      Toast.show({
+        type: 'success',
+        text1: 'Job Created',
+        text2: 'Your job was added successfully.',
+      });
+      navigation.goBack();
+    },
+
+    onError: (error) => {
+      handleApiError(error, setErrors, mapBackendErrors);
+    },
+  });
 
   const initialValues = {
     companyName: '',
@@ -19,41 +37,21 @@ export default function CreateJobScreen({ navigation }) {
     location: '',
     technologies: '',
     jobURL: '',
-    applicationDate: new Date(),
+    applicationDate: getTodayString(),
     status: 'Applied',
     notes: '',
-  };
-
-  const handleCreate = async payload => {
-    try {
-      setLoading(true);
-      setErrors({});
-
-      await createJob(payload);
-      Toast.show({
-        type: 'success',
-        text1: 'Job Created',
-        text2: 'Your job was added successfully.',
-      });
-      navigation.goBack();
-    } catch (error) {
-      if (error.details?.length) {
-        setErrors(mapBackendErrors(error.details));
-      } else {
-        setErrors({ general: error.message || 'Something went wrong' });
-      }
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
     <View style={{ flex: 1 }}>
       <JobForm
         initialValues={initialValues}
-        onSubmit={handleCreate}
+        onSubmit={(payload) => {
+          setErrors({});
+          createJobMutation.mutate(payload);
+        }}
         submitLabel="Create Job"
-        loading={loading}
+        loading={createJobMutation.isPending}
         errors={errors}
       />
     </View>

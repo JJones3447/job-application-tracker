@@ -1,46 +1,141 @@
-import React, { useState } from 'react';
-import { View, Button } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Button, Text } from 'react-native';
 import FormField from '../formField';
 import FormDatePicker from '../formDatePicker';
 import FormSelect from '../formSelect';
+import { JOB_STATUS_OPTIONS } from '../../../../constants/formOptions';
+import useFormValidation from '../../../../hooks/useFormValidation';
 
-const formatDate = date => {
-  if (!date) return '';
-  const d = new Date(date);
-  return d.toISOString().split('T')[0];
+const isValidUrl = value => {
+  if (!value?.trim()) return true;
+
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
-const JobForm = ({ onSubmit, initialValues = {}, submitLabel }) => {
-  const [formData, setFormData] = useState({
-    companyName: initialValues.companyName || '',
-    jobTitle: initialValues.jobTitle || '',
-    listedSalary: initialValues.listedSalary || '',
-    location: initialValues.location || '',
-    technologies: initialValues.technologies || '',
-    jobURL: initialValues.jobURL || '',
-    applicationDate: initialValues.applicationDate
-      ? formatDate(initialValues.applicationDate)
-      : '',
-    status: initialValues.status || 'Applied',
-    notes: initialValues.notes || '',
-  });
+const isValidDate = value => {
+  if (!value) return true;
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value).getTime());
+};
 
-  const updateField = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+const jobValidators = {
+  companyName: value => {
+    if (!value?.trim()) return 'Company name is required.';
+    if (value.trim().length > 100) return 'Company name cannot exceed 100 characters.';
+    return undefined;
+  },
+
+  jobTitle: value => {
+    if (!value?.trim()) return 'Job title is required.';
+    if (value.trim().length > 100) return 'Job title cannot exceed 100 characters.';
+    return undefined;
+  },
+
+  listedSalary: value => {
+    if (value && value.length > 50) return 'Listed salary cannot exceed 50 characters.';
+    return undefined;
+  },
+
+  location: value => {
+    if (value && value.length > 100) return 'Location cannot exceed 100 characters.';
+    return undefined;
+  },
+
+  technologies: value => {
+    if (value && typeof value !== 'string') return 'Technologies must be text.';
+    return undefined;
+  },
+
+  jobURL: value => {
+    if (!isValidUrl(value)) return 'Job URL must be a valid URL.';
+    return undefined;
+  },
+
+  applicationDate: value => {
+    if (!isValidDate(value)) return 'Application date must use YYYY-MM-DD format.';
+    return undefined;
+  },
+
+  status: value => {
+    const validStatuses = JOB_STATUS_OPTIONS.map(option => option.value);
+    if (value && !validStatuses.includes(value)) return 'Please select a valid status.';
+    return undefined;
+  },
+
+  notes: value => {
+    if (value && typeof value !== 'string') return 'Notes must be text.';
+    return undefined;
+  },
+};
+
+const JobForm = ({
+  onSubmit,
+  initialValues = {},
+  submitLabel,
+  loading = false,
+  errors = {},
+}) => {
+  const {
+    formData,
+    resetForm,
+    errors: validationErrors,
+    handleChange,
+    handleBlur,
+    validateForm,
+    shouldShowError,
+  } = useFormValidation(
+    {
+      companyName: '',
+      jobTitle: '',
+      listedSalary: '',
+      location: '',
+      technologies: '',
+      jobURL: '',
+      applicationDate: '',
+      status: 'Applied',
+      notes: '',
+    },
+    jobValidators
+  );
+
+  useEffect(() => {
+    resetForm({
+      companyName: initialValues.companyName ?? '',
+      jobTitle: initialValues.jobTitle ?? '',
+      listedSalary: initialValues.listedSalary ?? '',
+      location: initialValues.location ?? '',
+      technologies: initialValues.technologies ?? '',
+      jobURL: initialValues.jobURL ?? '',
+      applicationDate: initialValues.applicationDate ?? '',
+      status: initialValues.status ?? 'Applied',
+      notes: initialValues.notes ?? '',
+    });
+  }, [initialValues]);
+
+  const combinedErrors = {
+    ...validationErrors,
+    ...errors,
   };
 
   const handleSubmit = () => {
-    const payload = {
+    if (!validateForm()) return;
+
+    onSubmit({
       ...formData,
-      applicationDate: formData.applicationDate
-        ? formatDate(formData.applicationDate)
-        : null,
-    };
-    console.log("Payload: ", payload);
-    onSubmit(payload);
+      companyName: formData.companyName.trim(),
+      jobTitle: formData.jobTitle.trim(),
+      listedSalary: formData.listedSalary?.trim() || '',
+      location: formData.location?.trim() || '',
+      technologies: formData.technologies?.trim() || '',
+      jobURL: formData.jobURL?.trim() || '',
+      applicationDate: formData.applicationDate || null,
+      status: formData.status,
+      notes: formData.notes?.trim() || '',
+    });
   };
 
   return (
@@ -48,57 +143,79 @@ const JobForm = ({ onSubmit, initialValues = {}, submitLabel }) => {
       <FormField
         label="Company Name"
         value={formData.companyName}
-        onChange={text => updateField('companyName', text)}
+        onChange={text => handleChange('companyName', text)}
+        onBlur={() => handleBlur('companyName')}
+        error={shouldShowError('companyName') || combinedErrors.companyName}
       />
       <FormField
         label="Job Title"
         value={formData.jobTitle}
-        onChange={text => updateField('jobTitle', text)}
+        onChange={text => handleChange('jobTitle', text)}
+        onBlur={() => handleBlur('jobTitle')}
+        error={shouldShowError('jobTitle') || combinedErrors.jobTitle}
       />
       <FormField
         label="Listed Salary"
         value={formData.listedSalary}
-        onChange={text => updateField('listedSalary', text)}
+        onChange={text => handleChange('listedSalary', text)}
+        onBlur={() => handleBlur('listedSalary')}
+        error={shouldShowError('listedSalary') || combinedErrors.listedSalary}
       />
       <FormField
         label="Location"
         value={formData.location}
-        onChange={text => updateField('location', text)}
+        onChange={text => handleChange('location', text)}
+        onBlur={() => handleBlur('location')}
+        error={shouldShowError('location') || combinedErrors.location}
       />
       <FormField
-        label="Technologies (comma separated)"
+        label="Technologies"
         value={formData.technologies}
-        onChange={text => updateField('technologies', text)}
+        onChange={text => handleChange('technologies', text)}
+        onBlur={() => handleBlur('technologies')}
+        error={shouldShowError('technologies') || combinedErrors.technologies}
       />
       <FormField
         label="Job URL"
         value={formData.jobURL}
-        onChange={text => updateField('jobURL', text)}
+        onChange={text => handleChange('jobURL', text)}
+        onBlur={() => handleBlur('jobURL')}
+        autoCapitalize="none"
+        keyboardType="url"
+        error={shouldShowError('jobURL') || combinedErrors.jobURL}
       />
       <FormDatePicker
         label="Application Date"
         value={formData.applicationDate}
-        onChange={value => updateField('applicationDate', value)}
+        onChange={value => handleChange('applicationDate', value)}
+        error={shouldShowError('applicationDate') || combinedErrors.applicationDate}
       />
       <FormSelect
         label="Status"
         value={formData.status}
-        onChange={value => updateField('status', value)}
-        items={[
-          { label: 'Applied', value: 'Applied' },
-          { label: 'Interviewing', value: 'Interviewing' },
-          { label: 'Offer', value: 'Offer' },
-          { label: 'Rejected', value: 'Rejected' },
-          { label: 'Accepted', value: 'Accepted' },
-        ]}
+        onChange={value => handleChange('status', value)}
+        onBlur={() => handleBlur('status')}
+        items={JOB_STATUS_OPTIONS}
+        error={shouldShowError('status') || combinedErrors.status}
       />
       <FormField
         label="Notes"
         value={formData.notes}
-        onChange={text => updateField('notes', text)}
+        onChange={text => handleChange('notes', text)}
+        onBlur={() => handleBlur('notes')}
         multiline
+        error={shouldShowError('notes') || combinedErrors.notes}
       />
-      <Button title={submitLabel} onPress={handleSubmit} />
+      {combinedErrors.general && (
+        <Text style={{ color: 'red', marginBottom: 10 }}>
+          {combinedErrors.general}
+        </Text>
+      )}
+      <Button
+        title={loading ? 'Submitting...' : submitLabel}
+        onPress={handleSubmit}
+        disabled={loading}
+      />
     </View>
   );
 };

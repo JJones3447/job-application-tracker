@@ -1,84 +1,96 @@
-import {View, Text, ActivityIndicator, Alert, Button, Platform, FlatList, TouchableOpacity} from 'react-native';
-import { useCallback, useState, useContext } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import {getJob, getInterviewsForJob, deleteJob} from '../api';
-import { AuthContext } from '../context/authContext';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Button,
+  Platform,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
+import { useState } from 'react';
+import { getJob, getInterviewsForJob, deleteJob } from '../api';
 import Toast from 'react-native-toast-message';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '../api/queryKeys';
+import handleApiError from '../utils/handleApiError';
+import ConfirmModal from '../components/common/confirmModal';
+import { formatDate, formatDateTime } from '../utils/dateUtils';
 
 export default function JobDetailsScreen({ route, navigation }) {
   const { jobID } = route.params;
-  const { logout } = useContext(AuthContext);
+  const queryClient = useQueryClient();
+  const [confirmVisible, setConfirmVisible] = useState(false);
 
-  const [job, setJob] = useState(null);
-  const [interviews, setInterviews] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    data: jobData,
+    isLoading: jobLoading,
+    error: jobError,
+  } = useQuery({
+    queryKey: queryKeys.job(jobID),
+    queryFn: () => getJob(jobID),
+  });
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString([], {
-      dateStyle: 'medium',
-    });
-  };
+  const {
+    data: interviewsData,
+    isLoading: interviewsLoading,
+    error: interviewsError,
+  } = useQuery({
+    queryKey: queryKeys.jobInterviews(jobID),
+    queryFn: () => getInterviewsForJob(jobID),
+  });
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const jobRes = await getJob(jobID);
-      setJob(jobRes.data.job);
-      const interviewRes = await getInterviewsForJob(jobID);
-      setInterviews(interviewRes.data.interviews);
-    } catch (error) {
-      if (error.status === 401) logout();
-    } finally {
-      setLoading(false);
-    }
-  };
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteJob(jobID),
 
-  useFocusEffect(
-    useCallback(() => {
-      loadData();
-    }, [jobID])
-  );
-
-  const handleDelete = () => {
-    if (Platform.OS === 'web') {
-      const confirmed = window.confirm(
-        'Are you sure you want to delete this job? This action cannot be undone.'
-      );
-      if (confirmed) confirmDelete();
-      return;
-    }
-
-    Alert.alert(
-      'Delete Job',
-      'Are you sure you want to delete this job? This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: confirmDelete },
-      ]
-    );
-  };
-
-  const confirmDelete = async () => {
-    try {
-      await deleteJob(jobID);
+    onSuccess: () => {
       Toast.show({
         type: 'success',
         text1: 'Job Deleted',
       });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.jobs,
+      });
+      queryClient.removeQueries({
+        queryKey: queryKeys.job(jobID),
+      });
+      queryClient.removeQueries({
+        queryKey: queryKeys.jobInterviews(jobID),
+      });
       navigation.navigate('Jobs');
-    } catch (error) {
-      if (error.status === 401) logout();
-      else Alert.alert('Error', error.message);
-    }
+    },
+
+    onError: error => {
+      handleApiError(error);
+    },
+  });
+
+  const handleConfirmDelete = () => {
+    setConfirmVisible(false);
+    deleteMutation.mutate();
   };
 
-  if (loading) {
+  if (jobLoading || interviewsLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center' }}>
         <ActivityIndicator size="large" />
       </View>
     );
   }
+
+  if (jobError || interviewsError) {
+    return (
+      <View style={{ padding: 20 }}>
+        <Text>
+          {jobError?.message ||
+            interviewsError?.message ||
+            'Something went wrong'}
+        </Text>
+      </View>
+    );
+  }
+
+  const job = jobData?.job;
+  const interviews = interviewsData?.interviews || [];
 
   if (!job) {
     return (
@@ -101,9 +113,7 @@ export default function JobDetailsScreen({ route, navigation }) {
         {item.interviewType} — {item.result}
       </Text>
       <Text>
-        {item.interviewDate
-          ? new Date(item.interviewDate).toLocaleString()
-          : ''}
+        {item.interviewDate ? formatDateTime(item.interviewDate) : 'No date'}
       </Text>
     </TouchableOpacity>
   );
@@ -114,20 +124,22 @@ export default function JobDetailsScreen({ route, navigation }) {
         <Text style={{ fontSize: 22, fontWeight: 'bold' }}>
           {job.companyName}
         </Text>
-        <Text style={{ fontSize: 18 }}>
-          {job.jobTitle}
-        </Text>
+        <Text style={{ fontSize: 18 }}>{job.jobTitle}</Text>
         <Text>Status: {job.status}</Text>
         {job.location && <Text>Location: {job.location}</Text>}
         <Text>Listed Salary: {job.listedSalary || '-'}</Text>
-        {job.technologies && <Text>Technologies: {job.technologies}</Text>}
+        {job.technologies && (
+          <Text>Technologies: {job.technologies}</Text>
+        )}
         {job.jobURL && (
           <Text>
             Job URL:{' '}
             <Text
               style={{ color: 'blue' }}
               onPress={() => {
-                if (Platform.OS === 'web') window.open(job.jobURL, '_blank');
+                if (Platform.OS === 'web') {
+                  window.open(job.jobURL, '_blank');
+                }
               }}
             >
               {job.jobURL}
@@ -135,13 +147,13 @@ export default function JobDetailsScreen({ route, navigation }) {
           </Text>
         )}
         {job.applicationDate && (
-          <Text>
-            Applied on: {formatDate(job.applicationDate)}
-          </Text>
+          <Text>Applied on: {formatDate(job.applicationDate)}</Text>
         )}
         {job.notes && (
           <>
-            <Text style={{ marginTop: 10, fontWeight: 'bold' }}>Notes</Text>
+            <Text style={{ marginTop: 10, fontWeight: 'bold' }}>
+              Notes
+            </Text>
             <Text>{job.notes}</Text>
           </>
         )}
@@ -151,9 +163,7 @@ export default function JobDetailsScreen({ route, navigation }) {
           </Text>
           <FlatList
             data={interviews}
-            keyExtractor={(item) =>
-              item.interviewID.toString()
-            }
+            keyExtractor={item => item.interviewID.toString()}
             renderItem={renderInterview}
             ListEmptyComponent={
               <Text style={{ marginTop: 10 }}>
@@ -165,9 +175,7 @@ export default function JobDetailsScreen({ route, navigation }) {
             <Button
               title="Add Interview"
               onPress={() =>
-                navigation.navigate('CreateInterview', {
-                  jobID,
-                })
+                navigation.navigate('CreateInterview', { jobID })
               }
             />
           </View>
@@ -176,18 +184,27 @@ export default function JobDetailsScreen({ route, navigation }) {
       <View style={{ marginTop: 20 }}>
         <Button
           title="Edit Job"
-          onPress={() =>
-            navigation.navigate('EditJob', { jobID })
-          }
+          onPress={() => navigation.navigate('EditJob', { jobID })}
         />
         <View style={{ marginTop: 10 }}>
           <Button
-            title="Delete Job"
+            title={deleteMutation.isPending ? 'Deleting...' : 'Delete Job'}
             color="red"
-            onPress={handleDelete}
+            onPress={() => setConfirmVisible(true)}
+            disabled={deleteMutation.isPending}
           />
         </View>
       </View>
+
+      <ConfirmModal
+        visible={confirmVisible}
+        title="Delete Job"
+        message="Are you sure you want to delete this job? This action cannot be undone."
+        confirmLabel="Delete"
+        destructive
+        onCancel={() => setConfirmVisible(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </View>
   );
 }

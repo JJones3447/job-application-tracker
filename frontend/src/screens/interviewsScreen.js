@@ -1,32 +1,36 @@
-import {View, Text, FlatList, TouchableOpacity, ActivityIndicator} from 'react-native';
-import { useState, useCallback, useContext } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { getInterviews } from '../api';
-import { AuthContext } from '../context/authContext';
+import Toast from 'react-native-toast-message';
+import { queryKeys } from '../api/queryKeys';
+import { formatDateTime } from '../utils/dateUtils';
 
 export default function InterviewsScreen({ navigation }) {
-  const { logout } = useContext(AuthContext);
+  const { data, isLoading, error } = useQuery({
+    queryKey: queryKeys.interviews,
+    queryFn: getInterviews,
+  });
 
-  const [interviews, setInterviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const loadInterviews = async () => {
-    try {
-      setLoading(true);
-      const res = await getInterviews();
-      setInterviews(res.data.interviews);
-    } catch (err) {
-      if (err.status === 401) logout();
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to load interviews',
+        text2: error.message,
+      });
     }
-  };
+  }, [error]);
 
-  useFocusEffect(
-    useCallback(() => {
-      loadInterviews();
-    }, [])
-  );
+  const interviews = data?.interviews || [];
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   const renderInterview = ({ item }) => (
     <TouchableOpacity
@@ -43,21 +47,10 @@ export default function InterviewsScreen({ navigation }) {
       <Text>Type: {item.interviewType}</Text>
       <Text>Result: {item.result}</Text>
       <Text>
-        Date:{' '}
-        {item.interviewDate
-          ? new Date(item.interviewDate).toLocaleString()
-          : 'N/A'}
+        Date: {formatDateTime(item.interviewDate) || 'N/A'}
       </Text>
     </TouchableOpacity>
   );
-
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -67,7 +60,7 @@ export default function InterviewsScreen({ navigation }) {
         renderItem={renderInterview}
         ListEmptyComponent={
           <Text style={{ padding: 20 }}>
-            No Documented interviews found.
+            No documented interviews found.
           </Text>
         }
       />

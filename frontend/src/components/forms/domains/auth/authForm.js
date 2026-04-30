@@ -22,29 +22,30 @@ export default function AuthForm({
   };
 
   const validate = () => {
-    const newErrors = {};
+  const newErrors = {};
 
-    if (isRegister) {
-      if (!formData.name?.trim()) {
-        newErrors.name = 'Name is required.';
-      }
+  if (isRegister) {
+    if (!formData.name?.trim()) {
+      newErrors.name = 'Name is required.';
+    } else if (formData.name.length > 100) {
+      newErrors.name = 'Name cannot exceed 100 characters.';
     }
+  }
 
-    if (!formData.email?.trim()) {
-      newErrors.email = 'Email is required.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format.';
-    }
+  if (!formData.email?.trim()) {
+    newErrors.email = 'Email is required.';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    newErrors.email = 'Invalid email format.';
+  }
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required.';
-    } else if (isRegister && formData.password.length < 6) {
-      newErrors.password =
-        'Password must be at least 6 characters.';
-    }
+  if (!formData.password) {
+    newErrors.password = 'Password is required.';
+  } else if (formData.password.length < 6) {
+    newErrors.password = 'Password must be at least 6 characters.';
+  }
 
-    return newErrors;
-  };
+  return newErrors;
+};
 
   const handleSubmit = () => {
     const validationErrors = validate();
@@ -58,7 +59,7 @@ export default function AuthForm({
     onSubmit(formData);
   };
 
-  const combinedErrors = { ...localErrors, ...errors };
+  const combinedErrors = {...errors, ...localErrors,  };
 
   const renderError = field =>
     combinedErrors[field] ? (

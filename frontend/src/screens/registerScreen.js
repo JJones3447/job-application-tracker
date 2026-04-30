@@ -1,13 +1,14 @@
-import {useState, useContext} from 'react';
+import { useState, useContext } from 'react';
 import { View } from 'react-native';
-import { register, login } from '../api';
+import { register } from '../api';
 import AuthForm from '../components/forms/domains/auth/authForm';
 import mapAuthErrors from '../utils/mapAuthErrors';
+import handleApiError from '../utils/handleApiError';
 import { AuthContext } from '../context/authContext';
 
 export default function RegisterScreen() {
-  const {login} = useContext(AuthContext);
-  const [loading, setLoading] = useState(false);
+  const { login, authenticating } = useContext(AuthContext);
+
   const [errors, setErrors] = useState({});
 
   const initialValues = {
@@ -15,29 +16,24 @@ export default function RegisterScreen() {
     email: '',
     password: '',
   };
-  const handleRegister = async formData => {
+
+  const handleRegister = async (formData) => {
     try {
-      setLoading(true);
       setErrors({});
       await register(formData);
       await login(formData.email, formData.password);
-    } catch (err) {
-      if (err.details?.length) {
-        setErrors(mapAuthErrors(err.details));
-      } else {
-        setErrors({ general: err.message });
-      }
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      handleApiError(error, setErrors, mapAuthErrors);
     }
   };
+
   return (
     <View style={{ flex: 1 }}>
       <AuthForm
         initialValues={initialValues}
         onSubmit={handleRegister}
         submitLabel="Register"
-        loading={loading}
+        loading={authenticating}
         errors={errors}
         isRegister
       />

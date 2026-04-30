@@ -18,15 +18,9 @@ import EditInterviewScreen from '../screens/editInterviewScreen';
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
-  const {userToken, loading} = useContext(AuthContext);
+  const {userToken} = useContext(AuthContext);
   
-  if (loading){
-    return(
-      <View style={{ flex: 1, justifyContent: 'center'}}>
-        <ActivityIndicator size="large"/>
-      </View>
-    )
-  }
+
   return(
     <NavigationContainer>
       <Stack.Navigator>

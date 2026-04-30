@@ -1,42 +1,54 @@
-import { createContext, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {login as loginApi, getMe} from '../api/auth/authApi';
-import {setLogoutHandler} from '../api/client/client';
+import { createContext, useEffect, useState, useCallback } from 'react';
+import { login as loginApi, getMe } from '../api/auth/authApi';
+import { setLogoutHandler } from '../api/client/client';
+import {
+  loadStoredToken,
+  setAuthToken,
+  clearAuthToken,
+} from '../api/client/tokenStorage';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+  const queryClient = useQueryClient();
   const [userToken, setUserToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authenticating, setAuthenticating] = useState(false);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       setAuthenticating(true);
-      await AsyncStorage.removeItem('token');
+      await clearAuthToken();
+      queryClient.clear();
       setUserToken(null);
     } finally {
-      await new Promise(resolve => setTimeout(resolve, 150));
       setAuthenticating(false);
     }
-  
-  };
+  }, [queryClient]);
 
   const login = async (email, password) => {
     try {
       setAuthenticating(true);
+
       const data = await loginApi({ email, password });
-      await AsyncStorage.setItem('token', data.token);
+
+      await setAuthToken(data.token);
+      await getMe();
+
       setUserToken(data.token);
+
+      return data;
+    } catch (error) {
+      await clearAuthToken();
+      throw error;
     } finally {
-      await new Promise(resolve => setTimeout(resolve, 150));
       setAuthenticating(false);
     }
-    
   };
 
   const checkAuth = async () => {
-    const token = await AsyncStorage.getItem('token');
+    const token = await loadStoredToken();
 
     if (!token) {
       setLoading(false);
@@ -46,8 +58,9 @@ export function AuthProvider({ children }) {
     try {
       await getMe();
       setUserToken(token);
-    } catch {
-      await AsyncStorage.removeItem('token');
+    } catch (error) {
+      await clearAuthToken();
+      queryClient.clear();
       setUserToken(null);
     } finally {
       setLoading(false);
@@ -56,6 +69,8 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     setLogoutHandler(logout);
+  }, [logout]);
+  useEffect(() => {
     checkAuth();
   }, []);
 

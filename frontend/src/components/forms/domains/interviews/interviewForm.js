@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Button, } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Button, Text } from 'react-native';
 import FormField from '../formField';
 import FormDatePicker from '../formDatePicker';
 import FormSelect from '../formSelect';
@@ -10,98 +10,210 @@ import {
   MINUTE_OPTIONS,
   PERIOD_OPTIONS,
 } from '../../../../constants/formOptions';
+import useFormValidation from '../../../../hooks/useFormValidation';
 
 const buildISODate = (date, hour, minute, period) => {
-  let h = parseInt(hour);
+  if (!date) return null;
+
+  let h = parseInt(hour, 10);
+
   if (period === 'PM' && h !== 12) h += 12;
   if (period === 'AM' && h === 12) h = 0;
 
-  const [year, month, day] = date.split('-').map(Number);
-  const localDate = new Date(year, month - 1, day, h, parseInt(minute), 0);  
+  const formattedHour = String(h).padStart(2, '0');
+  const formattedMinute = String(minute).padStart(2, '0');
 
-  return localDate.toISOString().split('.')[0] + 'Z';
+  return `${date}T${formattedHour}:${formattedMinute}:00Z`;
 };
 
-const InterviewForm = ({ onSubmit, initialValues = {}, submitLabel }) => {
-  const [date, setDate] = useState(
-    initialValues.interviewDate
-      ? new Date(initialValues.interviewDate).toISOString().split('T')[0]
-      : ''
+const extractTime = isoString => {
+  if (!isoString) return { hour: '9', minute: '00', period: 'AM' };
+
+  const date = new Date(isoString);
+  let hours = date.getUTCHours();
+
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const period = hours >= 12 ? 'PM' : 'AM';
+
+  hours = hours % 12 || 12;
+
+  return {
+    hour: String(hours),
+    minute: minutes,
+    period,
+  };
+};
+
+const isValidDate = value => {
+  if (!value) return false;
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value).getTime());
+};
+
+const interviewValidators = {
+  date: value => {
+    if (!value) return 'Interview date is required.';
+    if (!isValidDate(value)) return 'Interview date must use YYYY-MM-DD format.';
+    return undefined;
+  },
+
+  interviewType: value => {
+    const validTypes = INTERVIEW_TYPES.map(option => option.value);
+    if (!value) return 'Interview type is required.';
+    if (!validTypes.includes(value)) return 'Please select a valid interview type.';
+    return undefined;
+  },
+
+  result: value => {
+    const validResults = INTERVIEW_RESULTS.map(option => option.value);
+    if (value && !validResults.includes(value)) return 'Please select a valid result.';
+    return undefined;
+  },
+
+  interviewNotes: value => {
+    if (value && typeof value !== 'string') return 'Interview notes must be text.';
+    return undefined;
+  },
+};
+
+const InterviewForm = ({
+  onSubmit,
+  initialValues = {},
+  submitLabel,
+  loading = false,
+  errors = {},
+}) => {
+  const {
+    formData,
+    resetForm,
+    errors: validationErrors,
+    handleChange,
+    handleBlur,
+    validateForm,
+    shouldShowError,
+  } = useFormValidation(
+    {
+      date: '',
+      hour: '9',
+      minute: '00',
+      period: 'AM',
+      interviewType: 'Phone',
+      result: 'Pending',
+      interviewNotes: '',
+    },
+    interviewValidators
   );
 
-  const [hour, setHour] = useState('9');
-  const [minute, setMinute] = useState('00');
-  const [period, setPeriod] = useState('AM');
+  useEffect(() => {
+    let date = '';
+    let hour = '9';
+    let minute = '00';
+    let period = 'AM';
 
-  const [formData, setFormData] = useState({
-    interviewType: initialValues.interviewType || 'Phone',
-    result: initialValues.result || 'Pending',
-    interviewNotes: initialValues.interviewNotes || '',
-  });
+    if (initialValues.interviewDate) {
+      const d = new Date(initialValues.interviewDate);
 
-  const updateField = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+      date = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+
+      const time = extractTime(initialValues.interviewDate);
+      hour = time.hour;
+      minute = time.minute;
+      period = time.period;
+    }
+
+    resetForm({
+      date,
+      hour,
+      minute,
+      period,
+      interviewType: initialValues.interviewType || 'Phone',
+      result: initialValues.result || 'Pending',
+      interviewNotes: initialValues.interviewNotes || '',
+    });
+  }, [initialValues]);
+
+  const combinedErrors = {
+    ...validationErrors,
+    ...errors,
   };
 
   const handleSubmit = () => {
-    const interviewDate = buildISODate(date, hour, minute, period);
-    const payload = {
+    if (!validateForm()) return;
+
+    const interviewDate = buildISODate(
+      formData.date,
+      formData.hour,
+      formData.minute,
+      formData.period
+    );
+
+    onSubmit({
       interviewDate,
       interviewType: formData.interviewType,
       result: formData.result,
-      interviewNotes: formData.interviewNotes,
-    };
-    console.log("Payload: ", payload);
-    onSubmit(payload);
+      interviewNotes: formData.interviewNotes?.trim() || '',
+    });
   };
 
   return (
     <View>
       <FormDatePicker
         label="Interview Date"
-        value={date}
-        onChange={setDate}
+        value={formData.date}
+        onChange={value => handleChange('date', value)}
+        error={shouldShowError('date') || combinedErrors.interviewDate}
       />
       <FormSelect
         label="Hour"
-        value={hour}
-        onChange={setHour}
+        value={formData.hour}
+        onChange={value => handleChange('hour', value)}
         items={HOUR_OPTIONS}
       />
       <FormSelect
         label="Minute"
-        value={minute}
-        onChange={setMinute}
+        value={formData.minute}
+        onChange={value => handleChange('minute', value)}
         items={MINUTE_OPTIONS}
       />
       <FormSelect
         label="AM / PM"
-        value={period}
-        onChange={setPeriod}
+        value={formData.period}
+        onChange={value => handleChange('period', value)}
         items={PERIOD_OPTIONS}
       />
       <FormSelect
         label="Interview Type"
         value={formData.interviewType}
-        onChange={value => updateField('interviewType', value)}
+        onChange={value => handleChange('interviewType', value)}
+        onBlur={() => handleBlur('interviewType')}
         items={INTERVIEW_TYPES}
+        error={shouldShowError('interviewType') || combinedErrors.interviewType}
       />
       <FormSelect
         label="Result"
         value={formData.result}
-        onChange={value => updateField('result', value)}
+        onChange={value => handleChange('result', value)}
+        onBlur={() => handleBlur('result')}
         items={INTERVIEW_RESULTS}
+        error={shouldShowError('result') || combinedErrors.result}
       />
       <FormField
         label="Notes"
         value={formData.interviewNotes}
-        onChange={text => updateField('interviewNotes', text)}
+        onChange={text => handleChange('interviewNotes', text)}
+        onBlur={() => handleBlur('interviewNotes')}
         multiline
+        error={shouldShowError('interviewNotes') || combinedErrors.interviewNotes}
       />
-      <Button title={submitLabel} onPress={handleSubmit} />
+      {combinedErrors.general && (
+        <Text style={{ color: 'red', marginBottom: 10 }}>
+          {combinedErrors.general}
+        </Text>
+      )}
+      <Button
+        title={loading ? 'Submitting...' : submitLabel}
+        onPress={handleSubmit}
+        disabled={loading}
+      />
     </View>
   );
 };

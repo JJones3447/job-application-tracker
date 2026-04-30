@@ -1,61 +1,48 @@
-import { useState, useContext } from 'react';
 import { View } from 'react-native';
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createInterviewForJob } from '../api';
 import InterviewForm from '../components/forms/domains/interviews/interviewForm';
 import mapInterviewErrors from '../utils/mapInterviewErrors';
+import handleApiError from '../utils/handleApiError';
 import Toast from 'react-native-toast-message';
-import { AuthContext } from '../context/authContext';
+import { queryKeys } from '../api/queryKeys';
 
 export default function CreateInterviewScreen({ route, navigation }) {
-  const {jobID} = route.params;
-  const {logout} = useContext(AuthContext);
+  const { jobID } = route.params;
+  const queryClient = useQueryClient();
 
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const initialValues = {
-    interviewDate: new Date(),
-    interviewType: 'Phone',
-    result: 'Pending',
-    interviewNotes: '',
-  };
+  const mutation = useMutation({
+    mutationFn: payload => createInterviewForJob(jobID, payload),
 
-  const handleCreate = async payload => {
-    try {
-      setLoading(true);
-      setErrors({});
-      await createInterviewForJob(jobID, payload);
+    onSuccess: () => {
       Toast.show({
         type: 'success',
         text1: 'Interview Created',
-        text2: 'Interview added successfully.',
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.interviews });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.jobInterviews(jobID),
       });
       navigation.goBack();
-    } catch (error) {
-      if (error.status === 401) {
-        logout();
-        return;
-      }
+    },
 
-      if (error.details?.length) {
-        setErrors(mapInterviewErrors(error.details));
-      } else {
-        setErrors({
-          general: error.message || 'Something went wrong',
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    onError: error => {
+      handleApiError(error, setErrors, mapInterviewErrors);
+    },
+  });
 
   return (
     <View style={{ flex: 1 }}>
       <InterviewForm
-        initialValues={initialValues}
-        onSubmit={handleCreate}
+        onSubmit={payload => {
+          setErrors({});
+          mutation.mutate(payload);
+        }}
         submitLabel="Create Interview"
-        loading={loading}
+        loading={mutation.isPending}
         errors={errors}
       />
     </View>

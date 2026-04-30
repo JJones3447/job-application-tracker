@@ -3,9 +3,20 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import AppNavigator from './src/navigation/appNavigator';
 import { AuthProvider, AuthContext } from './src/context/authContext';
 import Toast from 'react-native-toast-message';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 function Root() {
-  const {authenticating} = useContext(AuthContext);
+  const { loading, authenticating } = useContext(AuthContext);
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -22,13 +33,20 @@ function Root() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Root />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Root />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.4)',

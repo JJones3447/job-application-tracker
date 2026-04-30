@@ -1,40 +1,37 @@
 import { useState } from 'react';
 
-const useFormValidation = (initialState, requiredFields = []) => {
+export default function useFormValidation(initialState, validators = {}) {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const validateField = (field, value) => {
-    let message = '';
-
-    if (requiredFields.includes(field)) {
-      if (!value || value.trim?.() === '') {
-        message = 'This field is required';
-      }
+  const validateField = (field, value, allValues = formData) => {
+    const validator = validators[field];
+    if (!validator) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+      return true;
     }
-
+    const message = validator(value, allValues);
     setErrors(prev => ({
       ...prev,
-      [field]: message,
+      [field]: message || undefined,
     }));
-
     return !message;
   };
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
+    const nextData = {
+      ...formData,
       [field]: value,
-    }));
-
-    if (touched[field]) {
-      validateField(field, value);
+    };
+    setFormData(nextData);
+    if (touched[field] || isSubmitted) {
+      validateField(field, value, nextData);
     }
   };
 
-  const handleBlur = (field) => {
+  const handleBlur = field => {
     setTouched(prev => ({
       ...prev,
       [field]: true,
@@ -44,19 +41,29 @@ const useFormValidation = (initialState, requiredFields = []) => {
   };
 
   const validateForm = () => {
-    let isValid = true;
     setIsSubmitted(true);
-
-    requiredFields.forEach(field => {
-      const valid = validateField(field, formData[field]);
-      if (!valid) isValid = false;
+    let isValid = true;
+    const nextErrors = {};
+    Object.keys(validators).forEach(field => {
+      const message = validators[field](formData[field], formData);
+      if (message) {
+        nextErrors[field] = message;
+        isValid = false;
+      }
     });
-
+    setErrors(nextErrors);
     return isValid;
   };
 
-  const shouldShowError = (field) => {
-    return (touched[field] || isSubmitted) && errors[field];
+  const shouldShowError = field => {
+    return touched[field] || isSubmitted ? errors[field] : undefined;
+  };
+
+  const resetForm = nextState => {
+    setFormData(nextState);
+    setErrors({});
+    setTouched({});
+    setIsSubmitted(false);
   };
 
   return {
@@ -68,7 +75,6 @@ const useFormValidation = (initialState, requiredFields = []) => {
     handleBlur,
     validateForm,
     shouldShowError,
+    resetForm,
   };
-};
-
-export default useFormValidation;
+}
