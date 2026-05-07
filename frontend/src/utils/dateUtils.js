@@ -14,11 +14,22 @@ export const formatDateTime = isoString => {
   if (!isoString) return '';
 
   const date = new Date(isoString);
-  
-  return date.toLocaleString(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
+
+  const month = date.toLocaleString(undefined, {
+    month: 'short',
+    timeZone: 'UTC',
   });
+
+  const day = date.getUTCDate();
+  const year = date.getUTCFullYear();
+
+  let hours = date.getUTCHours();
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const period = hours >= 12 ? 'PM' : 'AM';
+
+  hours = hours % 12 || 12;
+
+  return `${month} ${day}, ${year}, ${hours}:${minutes} ${period}`;
 };
 
 export const getTodayString = () => {
