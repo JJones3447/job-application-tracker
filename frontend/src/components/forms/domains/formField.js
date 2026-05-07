@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { colors, radius, spacing, typography } from '../../../theme/theme';
 
 const FormField = ({
   label,
@@ -9,13 +10,13 @@ const FormField = ({
   multiline = false,
   error,
   keyboardType,
-  autoCapitalize,
+  autoCapitalize = 'sentences',
   secureTextEntry = false,
+  placeholder,
 }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
-
+      {label ? <Text style={styles.label}>{label}</Text> : null}
       <TextInput
         style={[
           styles.input,
@@ -29,37 +30,47 @@ const FormField = ({
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
         secureTextEntry={secureTextEntry}
+        placeholder={placeholder}
+        placeholderTextColor={colors.textMuted}
       />
 
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   label: {
-    marginBottom: 5,
-    fontWeight: 'bold',
+    color: colors.text,
+    fontSize: typography.small,
+    fontWeight: '800',
+    marginBottom: spacing.sm,
   },
   input: {
+    minHeight: 48,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    color: colors.text,
+    fontSize: typography.body,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   inputError: {
-    borderColor: 'red',
+    borderColor: colors.danger,
   },
   multiline: {
-    height: 100,
+    minHeight: 110,
     textAlignVertical: 'top',
   },
   error: {
-    color: 'red',
-    marginTop: 5,
+    color: colors.danger,
+    fontSize: typography.small,
+    marginTop: spacing.xs,
   },
 });
 

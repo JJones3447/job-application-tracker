@@ -1,17 +1,17 @@
 import { View } from 'react-native';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createInterviewForJob } from '../api';
-import InterviewForm from '../components/forms/domains/interviews/interviewForm';
-import mapInterviewErrors from '../utils/mapInterviewErrors';
-import handleApiError from '../utils/handleApiError';
+import { createInterviewForJob } from '../../api';
+import InterviewForm from '../../components/forms/domains/interviews/interviewForm';
+import mapInterviewErrors from '../../utils/mapInterviewErrors';
+import handleApiError from '../../utils/handleApiError';
 import Toast from 'react-native-toast-message';
-import { queryKeys } from '../api/queryKeys';
+import { queryKeys } from '../../api/queryKeys';
+import AppScreen from '../../components/common/AppScreen';
 
 export default function CreateInterviewScreen({ route, navigation }) {
   const { jobID } = route.params;
   const queryClient = useQueryClient();
-
   const [errors, setErrors] = useState({});
 
   const mutation = useMutation({
@@ -23,9 +23,7 @@ export default function CreateInterviewScreen({ route, navigation }) {
         text1: 'Interview Created',
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.interviews });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.jobInterviews(jobID),
-      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobInterviews(jobID) });
       navigation.goBack();
     },
 
@@ -35,7 +33,7 @@ export default function CreateInterviewScreen({ route, navigation }) {
   });
 
   return (
-    <View style={{ flex: 1 }}>
+    <AppScreen>
       <InterviewForm
         onSubmit={payload => {
           setErrors({});
@@ -45,6 +43,6 @@ export default function CreateInterviewScreen({ route, navigation }) {
         loading={mutation.isPending}
         errors={errors}
       />
-    </View>
+    </AppScreen>
   );
 }

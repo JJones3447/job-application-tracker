@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { View, ActivityIndicator, Text } from 'react-native';
-import { getJob, updateJob } from '../api';
-import JobForm from '../components/forms/domains/jobs/jobForm';
-import mapBackendErrors from '../utils/mapBackendErrors';
-import handleApiError from '../utils/handleApiError';
+import { getJob, updateJob } from '../../api';
+import JobForm from '../../components/forms/domains/jobs/jobForm';
+import mapBackendErrors from '../../utils/mapBackendErrors';
+import handleApiError from '../../utils/handleApiError';
 import Toast from 'react-native-toast-message';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../api/queryKeys';
+import { queryKeys } from '../../api/queryKeys';
+import AppScreen from '../../components/common/AppScreen';
+import ErrorState from '../../components/common/ErrorState';
+import LoadingState from '../../components/common/LoadingState';
 
 export default function EditJobScreen({ route, navigation }) {
   const { jobID } = route.params;
   const queryClient = useQueryClient();
-
   const [formErrors, setFormErrors] = useState({});
 
   const { data, isLoading, error } = useQuery({
@@ -57,27 +58,17 @@ export default function EditJobScreen({ route, navigation }) {
       }
     : null;
 
-  if (isLoading || !formData) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  if (isLoading) return <LoadingState message="Loading job..." />;
 
-  if (error) {
-    return (
-      <View style={{ padding: 20 }}>
-        <Text>{error.message || 'Failed to load job.'}</Text>
-      </View>
-    );
+  if (error || !formData) {
+    return <ErrorState message={error?.message || 'Failed to load job.'} />;
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <AppScreen>
       <JobForm
         initialValues={formData}
-        onSubmit={(payload) => {
+        onSubmit={payload => {
           setFormErrors({});
           updateMutation.mutate(payload);
         }}
@@ -85,6 +76,6 @@ export default function EditJobScreen({ route, navigation }) {
         loading={updateMutation.isPending}
         errors={formErrors}
       />
-    </View>
+    </AppScreen>
   );
 }

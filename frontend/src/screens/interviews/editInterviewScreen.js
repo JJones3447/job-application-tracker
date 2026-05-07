@@ -1,12 +1,15 @@
 import { View, ActivityIndicator, Text } from 'react-native';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getInterview, updateInterview } from '../api';
-import InterviewForm from '../components/forms/domains/interviews/interviewForm';
-import mapInterviewErrors from '../utils/mapInterviewErrors';
-import handleApiError from '../utils/handleApiError';
+import { getInterview, updateInterview } from '../../api';
+import InterviewForm from '../../components/forms/domains/interviews/interviewForm';
+import mapInterviewErrors from '../../utils/mapInterviewErrors';
+import handleApiError from '../../utils/handleApiError';
 import Toast from 'react-native-toast-message';
-import { queryKeys } from '../api/queryKeys';
+import { queryKeys } from '../../api/queryKeys';
+import AppScreen from '../../components/common/AppScreen';
+import ErrorState from '../../components/common/ErrorState';
+import LoadingState from '../../components/common/LoadingState';
 
 export default function EditInterviewScreen({ route, navigation }) {
   const { interviewID } = route.params;
@@ -45,23 +48,15 @@ export default function EditInterviewScreen({ route, navigation }) {
       handleApiError(error, setErrors, mapInterviewErrors);
     },
   });
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+
+  if (isLoading) return <LoadingState message="Loading interview..." />;
+
   if (error || !interview) {
-    return (
-      <View style={{ padding: 20 }}>
-        <Text>{error?.message || 'Interview not found.'}</Text>
-      </View>
-    );
+    return <ErrorState message={error?.message || 'Interview not found.'} />;
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <AppScreen>
       <InterviewForm
         initialValues={interview}
         onSubmit={payload => {
@@ -72,6 +67,6 @@ export default function EditInterviewScreen({ route, navigation }) {
         loading={mutation.isPending}
         errors={errors}
       />
-    </View>
+    </AppScreen>
   );
 }

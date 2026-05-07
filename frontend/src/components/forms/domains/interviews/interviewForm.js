@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
-import { View, Button, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import AppButton from '../../../common/AppButton';
+import Card from '../../../common/Card';
 import FormField from '../formField';
 import FormDatePicker from '../formDatePicker';
 import FormSelect from '../formSelect';
@@ -11,28 +13,39 @@ import {
   PERIOD_OPTIONS,
 } from '../../../../constants/formOptions';
 import useFormValidation from '../../../../hooks/useFormValidation';
+import { colors, spacing, typography } from '../../../../theme/theme';
 
 const buildISODate = (date, hour, minute, period) => {
   if (!date) return null;
+  const [year, month, day] = date.split('-').map(Number);
 
   let h = parseInt(hour, 10);
 
   if (period === 'PM' && h !== 12) h += 12;
   if (period === 'AM' && h === 12) h = 0;
 
-  const formattedHour = String(h).padStart(2, '0');
-  const formattedMinute = String(minute).padStart(2, '0');
+  const localDate = new Date(year, month - 1, day, h, Number(minute), 0);
 
-  return `${date}T${formattedHour}:${formattedMinute}:00Z`;
+  return localDate.toISOString().replace('.000Z', 'Z');
+};
+
+const extractDate = isoString => {
+  if (!isoString) return '';
+
+  const date = new Date(isoString);
+
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+    date.getDate()
+  ).padStart(2, '0')}`;
 };
 
 const extractTime = isoString => {
   if (!isoString) return { hour: '9', minute: '00', period: 'AM' };
 
   const date = new Date(isoString);
-  let hours = date.getUTCHours();
+  let hours = date.getHours();
 
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
   const period = hours >= 12 ? 'PM' : 'AM';
 
   hours = hours % 12 || 12;
@@ -46,7 +59,11 @@ const extractTime = isoString => {
 
 const isValidDate = value => {
   if (!value) return false;
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value).getTime());
+
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(new Date(value).getTime())
+  );
 };
 
 const interviewValidators = {
@@ -58,19 +75,28 @@ const interviewValidators = {
 
   interviewType: value => {
     const validTypes = INTERVIEW_TYPES.map(option => option.value);
+
     if (!value) return 'Interview type is required.';
     if (!validTypes.includes(value)) return 'Please select a valid interview type.';
+
     return undefined;
   },
 
   result: value => {
     const validResults = INTERVIEW_RESULTS.map(option => option.value);
-    if (value && !validResults.includes(value)) return 'Please select a valid result.';
+
+    if (value && !validResults.includes(value)) {
+      return 'Please select a valid result.';
+    }
+
     return undefined;
   },
 
   interviewNotes: value => {
-    if (value && typeof value !== 'string') return 'Interview notes must be text.';
+    if (value && typeof value !== 'string') {
+      return 'Interview notes must be text.';
+    }
+
     return undefined;
   },
 };
@@ -110,11 +136,9 @@ const InterviewForm = ({
     let period = 'AM';
 
     if (initialValues.interviewDate) {
-      const d = new Date(initialValues.interviewDate);
-
-      date = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-
+      date = extractDate(initialValues.interviewDate);
       const time = extractTime(initialValues.interviewDate);
+
       hour = time.hour;
       minute = time.minute;
       period = time.period;
@@ -155,31 +179,43 @@ const InterviewForm = ({
   };
 
   return (
-    <View>
+    <Card>
       <FormDatePicker
         label="Interview Date"
         value={formData.date}
         onChange={value => handleChange('date', value)}
         error={shouldShowError('date') || combinedErrors.interviewDate}
       />
-      <FormSelect
-        label="Hour"
-        value={formData.hour}
-        onChange={value => handleChange('hour', value)}
-        items={HOUR_OPTIONS}
-      />
-      <FormSelect
-        label="Minute"
-        value={formData.minute}
-        onChange={value => handleChange('minute', value)}
-        items={MINUTE_OPTIONS}
-      />
-      <FormSelect
-        label="AM / PM"
-        value={formData.period}
-        onChange={value => handleChange('period', value)}
-        items={PERIOD_OPTIONS}
-      />
+
+      <View style={styles.timeRow}>
+        <View style={styles.timeItem}>
+          <FormSelect
+            label="Hour"
+            value={formData.hour}
+            onChange={value => handleChange('hour', value)}
+            items={HOUR_OPTIONS}
+          />
+        </View>
+
+        <View style={styles.timeItem}>
+          <FormSelect
+            label="Minute"
+            value={formData.minute}
+            onChange={value => handleChange('minute', value)}
+            items={MINUTE_OPTIONS}
+          />
+        </View>
+
+        <View style={styles.timeItem}>
+          <FormSelect
+            label="AM / PM"
+            value={formData.period}
+            onChange={value => handleChange('period', value)}
+            items={PERIOD_OPTIONS}
+          />
+        </View>
+      </View>
+
       <FormSelect
         label="Interview Type"
         value={formData.interviewType}
@@ -202,20 +238,37 @@ const InterviewForm = ({
         onChange={text => handleChange('interviewNotes', text)}
         onBlur={() => handleBlur('interviewNotes')}
         multiline
+        placeholder="Add interview notes..."
         error={shouldShowError('interviewNotes') || combinedErrors.interviewNotes}
       />
-      {combinedErrors.general && (
-        <Text style={{ color: 'red', marginBottom: 10 }}>
-          {combinedErrors.general}
-        </Text>
-      )}
-      <Button
+
+      {combinedErrors.general ? (
+        <Text style={styles.generalError}>{combinedErrors.general}</Text>
+      ) : null}
+
+      <AppButton
         title={loading ? 'Submitting...' : submitLabel}
         onPress={handleSubmit}
+        loading={loading}
         disabled={loading}
       />
-    </View>
+    </Card>
   );
 };
+
+const styles = StyleSheet.create({
+  timeRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  timeItem: {
+    flex: 1,
+  },
+  generalError: {
+    color: colors.danger,
+    fontSize: typography.small,
+    marginBottom: spacing.md,
+  },
+});
 
 export default InterviewForm;

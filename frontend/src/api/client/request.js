@@ -1,6 +1,13 @@
 import apiClient from './client'
 
-const unwrap = (res) => res.data;
+const unwrap = res => {
+  const body = res.data;
+
+  return {
+    ...body,
+    ...(body.data || {}),
+  };
+};
 
 export const get = async (url) => {
   const res = await apiClient.get(url);

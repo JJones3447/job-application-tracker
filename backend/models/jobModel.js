@@ -30,23 +30,36 @@ const createJob = async (jobData) => {
 };
 
 const updateJob = async (jobID, userID, jobData) => {
-  const { companyName, jobTitle, listedSalary, location, technologies, jobURL, applicationDate, status, notes } = jobData;
+  const { companyName, jobTitle, listedSalary, location, technologies,
+    jobURL, applicationDate, status, notes,
+  } = jobData;
 
   const [result] = await pool.query(
     `UPDATE Job
      SET companyName = ?, jobTitle = ?, listedSalary = ?, location = ?, technologies = ?,
          jobURL = ?, applicationDate = ?, status = ?, notes = ?
      WHERE jobID = ? AND userID = ?`,
-    [
-      companyName, jobTitle, listedSalary, location, technologies,
-      jobURL, applicationDate, status, notes, jobID, userID]
+    [ companyName, jobTitle, listedSalary, location, technologies,
+      jobURL, applicationDate, status, notes, jobID,userID, ]
   );
+
+  if (result.affectedRows === 0) {
+    return null;
+  }
 
   return { jobID, userID, ...jobData };
 };
 
 const deleteJob = async (jobID, userID) => {
-  await pool.query('DELETE FROM Job WHERE jobID = ? AND userID = ?', [jobID, userID]);
+  const [result] = await pool.query(
+    'DELETE FROM Job WHERE jobID = ? AND userID = ?',
+    [jobID, userID]
+  );
+
+  if (result.affectedRows === 0) {
+    return null;
+  }
+
   return { message: `Job with ID ${jobID} deleted successfully.` };
 };
 

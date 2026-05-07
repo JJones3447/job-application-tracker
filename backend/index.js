@@ -5,6 +5,22 @@ const app = express();
 
 const db = require('./config/db'); 
 
+const requiredEnv = [
+  'DB_HOST',
+  'DB_USER',
+  'DB_PASSWORD',
+  'DB_NAME',
+  'JWT_SECRET',
+  'JWT_EXPIRES_IN',
+];
+
+for (const key of requiredEnv) {
+  if (!process.env[key]) {
+    console.error(`Missing required environment variable: ${key}`);
+    process.exit(1);
+  }
+}
+
 app.use(cors({
   origin: '*',
   methods: ['GET','POST','PUT','DELETE'],

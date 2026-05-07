@@ -1,13 +1,14 @@
 import { View } from 'react-native';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createJob } from '../api';
-import JobForm from '../components/forms/domains/jobs/jobForm';
-import mapBackendErrors from '../utils/mapBackendErrors';
-import handleApiError from '../utils/handleApiError';
+import { createJob } from '../../api';
+import JobForm from '../../components/forms/domains/jobs/jobForm';
+import mapBackendErrors from '../../utils/mapBackendErrors';
+import handleApiError from '../../utils/handleApiError';
 import Toast from 'react-native-toast-message';
-import { queryKeys } from '../api/queryKeys';
-import { getTodayString } from '../utils/dateUtils';
+import { queryKeys } from '../../api/queryKeys';
+import { getTodayString } from '../../utils/dateUtils';
+import AppScreen from '../../components/common/AppScreen';
 
 export default function CreateJobScreen({ navigation }) {
   const [errors, setErrors] = useState({});
@@ -43,10 +44,10 @@ export default function CreateJobScreen({ navigation }) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <AppScreen>
       <JobForm
         initialValues={initialValues}
-        onSubmit={(payload) => {
+        onSubmit={payload => {
           setErrors({});
           createJobMutation.mutate(payload);
         }}
@@ -54,6 +55,6 @@ export default function CreateJobScreen({ navigation }) {
         loading={createJobMutation.isPending}
         errors={errors}
       />
-    </View>
+    </AppScreen>
   );
 }

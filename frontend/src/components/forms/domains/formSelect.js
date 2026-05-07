@@ -1,5 +1,6 @@
-import { View, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
+import { colors, radius, spacing, typography } from '../../../theme/theme';
 
 export default function FormSelect({
   label,
@@ -11,42 +12,65 @@ export default function FormSelect({
   placeholder = {},
 }) {
   return (
-    <View style={{ marginBottom: 15 }}>
-      {label && <Text style={{ marginBottom: 5 }}>{label}</Text>}
-
+    <View style={styles.container}>
+      {label ? <Text style={styles.label}>{label}</Text> : null}
       <RNPickerSelect
         value={value}
         onValueChange={onChange}
         onClose={onBlur}
         items={items}
         placeholder={placeholder}
+        useNativeAndroidPickerStyle={false}
         style={{
           inputIOS: {
-            borderWidth: 1,
-            borderColor: error ? 'red' : '#ccc',
-            padding: 10,
-            borderRadius: 5,
+            ...styles.input,
+            ...(error ? styles.inputError : {}),
           },
           inputAndroid: {
-            borderWidth: 1,
-            borderColor: error ? 'red' : '#ccc',
-            padding: 10,
-            borderRadius: 5,
+            ...styles.input,
+            ...(error ? styles.inputError : {}),
           },
           inputWeb: {
-            borderWidth: 1,
-            borderColor: error ? 'red' : '#ccc',
-            padding: 10,
-            borderRadius: 5,
+            ...styles.input,
+            ...(error ? styles.inputError : {}),
+          },
+          placeholder: {
+            color: colors.textMuted,
           },
         }}
       />
-
-      {error && (
-        <Text style={{ color: 'red', marginTop: 5 }}>
-          {error}
-        </Text>
-      )}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: spacing.md,
+  },
+  label: {
+    color: colors.text,
+    fontSize: typography.small,
+    fontWeight: '800',
+    marginBottom: spacing.sm,
+  },
+  input: {
+    minHeight: 48,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    color: colors.text,
+    fontSize: typography.body,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  inputError: {
+    borderColor: colors.danger,
+  },
+  error: {
+    color: colors.danger,
+    fontSize: typography.small,
+    marginTop: spacing.xs,
+  },
+});

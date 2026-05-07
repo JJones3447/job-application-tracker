@@ -1,19 +1,18 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useContext } from 'react';
-import { View, ActivityIndicator } from 'react-native';
-
-import LoginScreen from '../screens/loginScreen';
-import JobsScreen from '../screens/jobsScreen';
-import JobDetailsScreen from '../screens/jobDetailsScreen';
-import CreateJobScreen from '../screens/createJobScreen';
+import LoginScreen from '../screens/auth/loginScreen';
+import JobsScreen from '../screens/jobs/jobsScreen';
+import JobDetailsScreen from '../screens/jobs/jobDetailsScreen';
+import CreateJobScreen from '../screens/jobs/createJobScreen';
 import { AuthContext } from '../context/authContext';
-import EditJobScreen from '../screens/editJobScreen';
-import RegisterScreen from '../screens/registerScreen';
-import InterviewsScreen from '../screens/interviewsScreen';
-import InterviewDetailsScreen from '../screens/interviewDetailsScreen';
-import CreateInterviewScreen from '../screens/createInterviewScreen';
-import EditInterviewScreen from '../screens/editInterviewScreen';
+import EditJobScreen from '../screens/jobs/editJobScreen';
+import RegisterScreen from '../screens/auth/registerScreen';
+import InterviewsScreen from '../screens/interviews/interviewsScreen';
+import InterviewDetailsScreen from '../screens/interviews/interviewDetailsScreen';
+import CreateInterviewScreen from '../screens/interviews/createInterviewScreen';
+import EditInterviewScreen from '../screens/interviews/editInterviewScreen';
+import HomeScreen from '../screens/homeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +25,7 @@ export default function AppNavigator() {
       <Stack.Navigator>
         {userToken ? (
           <>
+            <Stack.Screen name="Home" component={HomeScreen} options={{title: 'Dashboard'}}></Stack.Screen>
             <Stack.Screen name="Jobs" component={JobsScreen} />
             <Stack.Screen name="JobDetails" component={JobDetailsScreen} options={{title: 'Job Details'}} />
             <Stack.Screen name="CreateJob" component={CreateJobScreen} options={{title: 'Add Job'}} />

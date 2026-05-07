@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
-import { View, Button, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+import AppButton from '../../../common/AppButton';
+import Card from '../../../common/Card';
 import FormField from '../formField';
 import FormDatePicker from '../formDatePicker';
 import FormSelect from '../formSelect';
 import { JOB_STATUS_OPTIONS } from '../../../../constants/formOptions';
 import useFormValidation from '../../../../hooks/useFormValidation';
+import { colors, spacing, typography } from '../../../../theme/theme';
 
 const isValidUrl = value => {
   if (!value?.trim()) return true;
@@ -19,7 +22,11 @@ const isValidUrl = value => {
 
 const isValidDate = value => {
   if (!value) return true;
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value).getTime());
+
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(new Date(value).getTime())
+  );
 };
 
 const jobValidators = {
@@ -62,7 +69,11 @@ const jobValidators = {
 
   status: value => {
     const validStatuses = JOB_STATUS_OPTIONS.map(option => option.value);
-    if (value && !validStatuses.includes(value)) return 'Please select a valid status.';
+
+    if (value && !validStatuses.includes(value)) {
+      return 'Please select a valid status.';
+    }
+
     return undefined;
   },
 
@@ -139,12 +150,13 @@ const JobForm = ({
   };
 
   return (
-    <View>
+    <Card>
       <FormField
         label="Company Name"
         value={formData.companyName}
         onChange={text => handleChange('companyName', text)}
         onBlur={() => handleBlur('companyName')}
+        placeholder="Company name"
         error={shouldShowError('companyName') || combinedErrors.companyName}
       />
       <FormField
@@ -152,6 +164,7 @@ const JobForm = ({
         value={formData.jobTitle}
         onChange={text => handleChange('jobTitle', text)}
         onBlur={() => handleBlur('jobTitle')}
+        placeholder="Software Engineer"
         error={shouldShowError('jobTitle') || combinedErrors.jobTitle}
       />
       <FormField
@@ -159,6 +172,7 @@ const JobForm = ({
         value={formData.listedSalary}
         onChange={text => handleChange('listedSalary', text)}
         onBlur={() => handleBlur('listedSalary')}
+        placeholder="$80,000 - $100,000"
         error={shouldShowError('listedSalary') || combinedErrors.listedSalary}
       />
       <FormField
@@ -166,6 +180,7 @@ const JobForm = ({
         value={formData.location}
         onChange={text => handleChange('location', text)}
         onBlur={() => handleBlur('location')}
+        placeholder="Remote, Chicago, IL, etc."
         error={shouldShowError('location') || combinedErrors.location}
       />
       <FormField
@@ -173,6 +188,7 @@ const JobForm = ({
         value={formData.technologies}
         onChange={text => handleChange('technologies', text)}
         onBlur={() => handleBlur('technologies')}
+        placeholder="React, Node.js, MySQL"
         error={shouldShowError('technologies') || combinedErrors.technologies}
       />
       <FormField
@@ -182,6 +198,7 @@ const JobForm = ({
         onBlur={() => handleBlur('jobURL')}
         autoCapitalize="none"
         keyboardType="url"
+        placeholder="https://example.com/job-posting"
         error={shouldShowError('jobURL') || combinedErrors.jobURL}
       />
       <FormDatePicker
@@ -204,20 +221,28 @@ const JobForm = ({
         onChange={text => handleChange('notes', text)}
         onBlur={() => handleBlur('notes')}
         multiline
+        placeholder="Add notes about the role..."
         error={shouldShowError('notes') || combinedErrors.notes}
       />
-      {combinedErrors.general && (
-        <Text style={{ color: 'red', marginBottom: 10 }}>
-          {combinedErrors.general}
-        </Text>
-      )}
-      <Button
+      {combinedErrors.general ? (
+        <Text style={styles.generalError}>{combinedErrors.general}</Text>
+      ) : null}
+      <AppButton
         title={loading ? 'Submitting...' : submitLabel}
         onPress={handleSubmit}
+        loading={loading}
         disabled={loading}
       />
-    </View>
+    </Card>
   );
 };
+
+const styles = StyleSheet.create({
+  generalError: {
+    color: colors.danger,
+    fontSize: typography.small,
+    marginBottom: spacing.md,
+  },
+});
 
 export default JobForm;

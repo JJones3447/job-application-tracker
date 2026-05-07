@@ -1,4 +1,6 @@
-import { Modal, View, Text, Button, StyleSheet } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import AppButton from './AppButton';
+import { colors, radius, shadows, spacing, typography } from '../../theme/theme';
 
 export default function ConfirmModal({
   visible,
@@ -17,29 +19,33 @@ export default function ConfirmModal({
       animationType="fade"
       onRequestClose={onCancel}
     >
-      <View style={styles.backdrop}>
-        <View style={styles.card}>
+      <Pressable style={styles.backdrop} onPress={onCancel}>
+        <Pressable style={styles.card} onPress={event => event.stopPropagation()}>
           <Text style={styles.title}>{title}</Text>
 
-          {message ? (
-            <Text style={styles.message}>{message}</Text>
-          ) : null}
+          {message ? <Text style={styles.message}>{message}</Text> : null}
 
           <View style={styles.actions}>
-            <View style={styles.button}>
-              <Button title={cancelLabel} onPress={onCancel} />
+            <View style={styles.actionButton}>
+              <AppButton
+                title={cancelLabel}
+                onPress={onCancel}
+                variant="secondary"
+                fullWidth
+              />
             </View>
 
-            <View style={styles.button}>
-              <Button
+            <View style={styles.actionButton}>
+              <AppButton
                 title={confirmLabel}
-                color={destructive ? 'red' : undefined}
                 onPress={onConfirm}
+                variant={destructive ? 'danger' : 'primary'}
+                fullWidth
               />
             </View>
           </View>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }
@@ -47,33 +53,38 @@ export default function ConfirmModal({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: 'rgba(0,0,0,0.72)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
   },
   card: {
     width: '100%',
     maxWidth: 420,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
+    backgroundColor: colors.surfaceElevated,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    ...shadows.card,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    color: colors.text,
+    fontSize: typography.subtitle,
+    fontWeight: '900',
+    marginBottom: spacing.sm,
   },
   message: {
-    marginBottom: 20,
-    lineHeight: 20,
+    color: colors.textMuted,
+    fontSize: typography.body,
+    lineHeight: 22,
+    marginBottom: spacing.lg,
   },
   actions: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
+    gap: spacing.md,
   },
-  button: {
-    minWidth: 100,
+  actionButton: {
+    flex: 1,
   },
 });
