@@ -2,7 +2,7 @@ import {
   View,
   Text,
   Pressable,
-  Button,
+  StyleSheet,
   Platform,
   FlatList,
   Linking,

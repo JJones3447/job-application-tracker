@@ -1,5 +1,5 @@
 import { useEffect, } from 'react';
-import { View, Text, FlatList, Pressable } from 'react-native';
+import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { getJobs } from '../../api';
 import Toast from 'react-native-toast-message';
