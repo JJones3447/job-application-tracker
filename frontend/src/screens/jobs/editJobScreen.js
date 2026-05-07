@@ -52,7 +52,9 @@ export default function EditJobScreen({ route, navigation }) {
         location: job.location ?? '',
         technologies: job.technologies ?? '',
         jobURL: job.jobURL ?? '',
-        applicationDate: job.applicationDate || '',
+        applicationDate: job.applicationDate
+          ? job.applicationDate.slice(0, 10)
+          : '',
         status: job.status ?? 'Applied',
         notes: job.notes ?? '',
       }

@@ -1,7 +1,9 @@
 export const formatDate = dateString => {
-  if (!dateString || typeof dateString !== 'string') return '';
+   if (!dateString || typeof dateString !== 'string') return '';
 
-  const parts = dateString.split('-');
+  const dateOnly = dateString.slice(0, 10);
+  const parts = dateOnly.split('-');
+
   if (parts.length !== 3) return dateString;
 
   const [year, month, day] = parts;
