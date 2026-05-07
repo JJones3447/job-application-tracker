@@ -18,15 +18,16 @@ import { colors, spacing, typography } from '../../../../theme/theme';
 const buildISODate = (date, hour, minute, period) => {
   if (!date) return null;
 
+  const [year, month, day] = date.split('-').map(Number);
+
   let h = parseInt(hour, 10);
 
   if (period === 'PM' && h !== 12) h += 12;
   if (period === 'AM' && h === 12) h = 0;
 
-  const formattedHour = String(h).padStart(2, '0');
-  const formattedMinute = String(minute).padStart(2, '0');
+  const localDate = new Date(year, month - 1, day, h, Number(minute), 0);
 
-  return `${date}T${formattedHour}:${formattedMinute}:00Z`;
+  return localDate.toISOString().replace('.000Z', 'Z');
 };
 
 const extractDate = isoString => {
@@ -34,8 +35,8 @@ const extractDate = isoString => {
 
   const date = new Date(isoString);
 
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(
-    date.getUTCDate()
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+    date.getDate()
   ).padStart(2, '0')}`;
 };
 
@@ -43,9 +44,9 @@ const extractTime = isoString => {
   if (!isoString) return { hour: '9', minute: '00', period: 'AM' };
 
   const date = new Date(isoString);
-  let hours = date.getUTCHours();
+  let hours = date.getHours();
 
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
   const period = hours >= 12 ? 'PM' : 'AM';
 
   hours = hours % 12 || 12;

@@ -15,21 +15,10 @@ export const formatDateTime = isoString => {
 
   const date = new Date(isoString);
 
-  const month = date.toLocaleString(undefined, {
-    month: 'short',
-    timeZone: 'UTC',
+  return date.toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
   });
-
-  const day = date.getUTCDate();
-  const year = date.getUTCFullYear();
-
-  let hours = date.getUTCHours();
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-  const period = hours >= 12 ? 'PM' : 'AM';
-
-  hours = hours % 12 || 12;
-
-  return `${month} ${day}, ${year}, ${hours}:${minutes} ${period}`;
 };
 
 export const getTodayString = () => {
