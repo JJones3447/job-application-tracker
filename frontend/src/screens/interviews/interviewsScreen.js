@@ -9,7 +9,7 @@ import AppScreen from '../../components/common/AppScreen';
 import Card from '../../components/common/Card';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingState from '../../components/common/LoadingState';
-import { colors, spacing, typography } from '../../theme/theme';
+import { colors, spacing, typography, getInterviewResultColor } from '../../theme/theme';
 
 export default function InterviewsScreen({ navigation }) {
   const { data, isLoading, error } = useQuery({
@@ -29,6 +29,13 @@ export default function InterviewsScreen({ navigation }) {
 
   const interviews = data?.interviews || [];
 
+  const sortedInterviews = [...interviews].sort((a, b) => {
+    const aTime = new Date(a.interviewDate).getTime();
+    const bTime = new Date(b.interviewDate).getTime();
+
+    return aTime - bTime;
+  });
+
   if (isLoading) {
     return <LoadingState message="Loading interviews..." />;
   }
@@ -45,11 +52,18 @@ export default function InterviewsScreen({ navigation }) {
       <Card>
         <Text style={styles.cardTitle}>{item.companyName}</Text>
         <Text style={styles.cardSubtitle}>{item.jobTitle}</Text>
+
         <View style={styles.metaRow}>
           <Text style={styles.badge}>
             {item.interviewType || 'Interview'}
           </Text>
-          <Text style={styles.metaText}>
+
+          <Text
+            style={[
+              styles.resultBadge,
+              { backgroundColor: getInterviewResultColor(item.result) },
+            ]}
+          >
             {item.result || 'N/A'}
           </Text>
         </View>
@@ -57,6 +71,8 @@ export default function InterviewsScreen({ navigation }) {
         <Text style={styles.date}>
           {formatDateTime(item.interviewDate) || 'N/A'}
         </Text>
+
+        <Text style={styles.tapHint}>Tap to view details →</Text>
       </Card>
     </Pressable>
   );
@@ -71,7 +87,7 @@ export default function InterviewsScreen({ navigation }) {
       </View>
 
       <FlatList
-        data={interviews}
+        data={sortedInterviews}
         keyExtractor={item => item.interviewID.toString()}
         renderItem={renderInterview}
         showsVerticalScrollIndicator={false}
@@ -123,6 +139,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     marginTop: spacing.md,
+    flexWrap: 'wrap',
   },
   badge: {
     color: colors.black,
@@ -134,14 +151,24 @@ const styles = StyleSheet.create({
     fontSize: typography.small,
     fontWeight: '900',
   },
-  metaText: {
-    color: colors.textMuted,
+  resultBadge: {
+    color: colors.black,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: 999,
+    overflow: 'hidden',
     fontSize: typography.small,
-    fontWeight: '700',
+    fontWeight: '900',
   },
   date: {
     color: colors.textMuted,
     fontSize: typography.small,
+    marginTop: spacing.md,
+  },
+  tapHint: {
+    color: colors.green,
+    fontSize: typography.tiny,
+    fontWeight: '800',
     marginTop: spacing.md,
   },
 });

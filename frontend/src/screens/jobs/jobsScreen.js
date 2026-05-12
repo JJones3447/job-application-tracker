@@ -9,7 +9,8 @@ import AppScreen from '../../components/common/AppScreen';
 import Card from '../../components/common/Card';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingState from '../../components/common/LoadingState';
-import { colors, spacing, typography }from '../../theme/theme'
+import { colors, spacing, typography, getJobStatusColor }from '../../theme/theme'
+import { formatDate } from '../../utils/dateUtils';
 
 export default function JobsScreen({ navigation }) {
   const { data, isLoading, error } = useQuery({
@@ -47,10 +48,24 @@ export default function JobsScreen({ navigation }) {
           <View style={styles.cardTextGroup}>
             <Text style={styles.company}>{item.companyName}</Text>
             <Text style={styles.jobTitle}>{item.jobTitle}</Text>
+
+            <Text style={styles.cardMeta}>
+              {item.applicationDate
+                ? `Applied ${formatDate(item.applicationDate)}`
+                : 'No application date'}
+              {item.location ? ` • ${item.location}` : ''}
+            </Text>
+
+            <Text style={styles.tapHint}>Tap to view details →</Text>
           </View>
 
-          <View style={styles.statusPill}>
-            <Text style={styles.statusText}>{item.status}</Text>
+          <View
+            style={[
+              styles.statusPill,
+              { backgroundColor: getJobStatusColor(item.status) },
+            ]}
+          >
+            <Text style={styles.statusText}>{item.status || 'N/A'}</Text>
           </View>
         </View>
       </Card>
@@ -140,8 +155,18 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     marginTop: spacing.xs,
   },
+  cardMeta: {
+    color: colors.textMuted,
+    fontSize: typography.small,
+    marginTop: spacing.sm,
+  },
+  tapHint: {
+    color: colors.green,
+    fontSize: typography.tiny,
+    fontWeight: '800',
+    marginTop: spacing.md,
+  },
   statusPill: {
-    backgroundColor: colors.green,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: 999,
@@ -150,8 +175,5 @@ const styles = StyleSheet.create({
     color: colors.black,
     fontSize: typography.tiny,
     fontWeight: '900',
-  },
-  footer: {
-    paddingTop: spacing.md,
   },
 });

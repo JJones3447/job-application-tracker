@@ -47,3 +47,35 @@ export const shadows = {
     elevation: 4,
   },
 };
+
+export const getJobStatusColor = status => {
+  switch (status) {
+    case 'Applied':
+      return colors.green;
+    case 'Interviewing':
+      return colors.warning;
+    case 'Rejected':
+      return colors.danger;
+    case 'Offer':
+      return colors.green;
+    case 'Accepted':
+      return colors.greenDark;
+    default:
+      return colors.border;
+  }
+};
+
+export const getInterviewResultColor = result => {
+  switch (result) {
+    case 'Pending':
+      return colors.warning;
+    case 'Passed':
+      return colors.green;
+    case 'Failed':
+      return colors.danger;
+    case 'Offer Extended':
+      return colors.greenDark;
+    default:
+      return colors.border;
+  }
+};
