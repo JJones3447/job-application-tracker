@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import { colors, radius, spacing, typography } from '../../../theme/theme';
 
@@ -21,6 +21,14 @@ export default function FormSelect({
         items={items}
         placeholder={placeholder}
         useNativeAndroidPickerStyle={false}
+        doneText="Done"
+        fixAndroidTouchableBug
+        pickerProps={{
+          itemStyle: {
+            color: colors.text,
+            fontSize: typography.body,
+          },
+        }}
         style={{
           inputIOS: {
             ...styles.input,
@@ -34,11 +42,30 @@ export default function FormSelect({
             ...styles.input,
             ...(error ? styles.inputError : {}),
           },
+          inputIOSContainer: {
+            pointerEvents: 'none',
+          },
           placeholder: {
             color: colors.textMuted,
           },
+          modalViewMiddle: {
+            backgroundColor: colors.surfaceElevated,
+          },
+          modalViewBottom: {
+            backgroundColor: colors.surfaceElevated,
+          },
+          done: {
+            color: colors.green,
+            fontWeight: '800',
+          },
         }}
+        Icon={
+          Platform.OS === 'ios'
+            ? () => <Text style={styles.chevron}>⌄</Text>
+            : undefined
+        }
       />
+
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
@@ -64,9 +91,16 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
+    paddingRight: spacing.xl,
   },
   inputError: {
     borderColor: colors.danger,
+  },
+  chevron: {
+    color: colors.textMuted,
+    fontSize: 20,
+    paddingRight: spacing.md,
+    paddingTop: spacing.md,
   },
   error: {
     color: colors.danger,
