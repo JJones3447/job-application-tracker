@@ -1,5 +1,5 @@
-import { useEffect, } from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, FlatList, Pressable, StyleSheet, TextInput } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { getJobs } from '../../api';
 import Toast from 'react-native-toast-message';
@@ -13,6 +13,8 @@ import { colors, spacing, typography, getJobStatusColor }from '../../theme/theme
 import { formatDate } from '../../utils/dateUtils';
 
 export default function JobsScreen({ navigation }) {
+  const [searchTerm, setSearchTerm] = useState('');
+
   const { data, isLoading, error } = useQuery({
     queryKey: queryKeys.jobs,
     queryFn: getJobs,
@@ -29,6 +31,27 @@ export default function JobsScreen({ navigation }) {
   }, [error]);
 
   const jobs = data?.jobs || [];
+
+  const filteredJobs = jobs.filter(job => {
+    const search = searchTerm.trim().toLowerCase();
+
+    if (!search) return true;
+
+    const searchableText = [
+      job.companyName,
+      job.jobTitle,
+      job.location,
+      job.technologies,
+      job.status,
+      job.listedSalary,
+      job.notes,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    return searchableText.includes(search);
+  });
 
   if (isLoading) {
     return <LoadingState message="Loading jobs..." />;
@@ -56,7 +79,7 @@ export default function JobsScreen({ navigation }) {
               {item.location ? ` • ${item.location}` : ''}
             </Text>
 
-            <Text style={styles.tapHint}>Tap to view details →</Text>
+            <Text style={styles.tapHint}>Tap to view details</Text>
           </View>
 
           <View
@@ -89,18 +112,32 @@ export default function JobsScreen({ navigation }) {
         />
       </View>
 
+      <TextInput
+        value={searchTerm}
+        onChangeText={setSearchTerm}
+        placeholder="Search by company, title, location, tech, or status..."
+        placeholderTextColor={colors.textMuted}
+        style={styles.searchInput}
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+
       <FlatList
-        data={jobs}
+        data={filteredJobs}
         keyExtractor={item => item.jobID.toString()}
         renderItem={renderJob}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <EmptyState
-            title="No jobs yet"
-            message="Create your first job entry to begin tracking applications."
-            actionLabel="Add Job"
-            onAction={() => navigation.navigate('CreateJob')}
+            title={searchTerm ? 'No matching jobs' : 'No jobs yet'}
+            message={
+              searchTerm
+                ? 'Try searching for a different company, title, location, technology, or status.'
+                : 'Create your first job entry to begin tracking applications.'
+            }
+            actionLabel={searchTerm ? undefined : 'Add Job'}
+            onAction={searchTerm ? undefined : () => navigation.navigate('CreateJob')}
           />
         }
       />
@@ -132,6 +169,18 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     marginTop: spacing.xs,
     lineHeight: 22,
+  },
+  searchInput: {
+    minHeight: 48,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    color: colors.text,
+    fontSize: typography.body,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
   },
   listContent: {
     paddingBottom: spacing.xxl,
