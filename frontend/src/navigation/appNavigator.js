@@ -1,21 +1,17 @@
+import { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useContext } from 'react';
-
-import LoginScreen from '../screens/auth/loginScreen';
-import RegisterScreen from '../screens/auth/registerScreen';
-
-import JobDetailsScreen from '../screens/jobs/jobDetailsScreen';
-import CreateJobScreen from '../screens/jobs/createJobScreen';
-import EditJobScreen from '../screens/jobs/editJobScreen';
-
-import InterviewDetailsScreen from '../screens/interviews/interviewDetailsScreen';
-import CreateInterviewScreen from '../screens/interviews/createInterviewScreen';
-import EditInterviewScreen from '../screens/interviews/editInterviewScreen';
-
-import MainTabs from './mainTabs';
 
 import { AuthContext } from '../context/authContext';
+import CreateInterviewScreen from '../screens/interviews/createInterviewScreen';
+import CreateJobScreen from '../screens/jobs/createJobScreen';
+import EditInterviewScreen from '../screens/interviews/editInterviewScreen';
+import EditJobScreen from '../screens/jobs/editJobScreen';
+import InterviewDetailsScreen from '../screens/interviews/interviewDetailsScreen';
+import JobDetailsScreen from '../screens/jobs/jobDetailsScreen';
+import LoginScreen from '../screens/auth/loginScreen';
+import MainTabs from './mainTabs';
+import RegisterScreen from '../screens/auth/registerScreen';
 import { colors } from '../theme/theme';
 
 const Stack = createNativeStackNavigator();

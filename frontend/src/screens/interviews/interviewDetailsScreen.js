@@ -1,47 +1,56 @@
-import { View, Text, StyleSheet, } from 'react-native';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getInterview, deleteInterview } from '../../api';
+import { StyleSheet, Text, View } from 'react-native';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
+
+import { deleteInterview, getInterview } from '../../api';
 import { queryKeys } from '../../api/queryKeys';
-import handleApiError from '../../utils/handleApiError';
-import ConfirmModal from '../../components/common/confirmModal';
 import AppButton from '../../components/common/AppButton';
 import AppScreen from '../../components/common/AppScreen';
 import Card from '../../components/common/Card';
+import ConfirmModal from '../../components/common/confirmModal';
 import ErrorState from '../../components/common/ErrorState';
 import LoadingState from '../../components/common/LoadingState';
-import { formatDateTime } from '../../utils/dateUtils';
 import { colors, spacing, typography } from '../../theme/theme';
+import { formatDateTime } from '../../utils/dateUtils';
+import handleApiError from '../../utils/handleApiError';
 
 export default function InterviewDetailsScreen({ route, navigation }) {
   const { interviewID } = route.params;
   const queryClient = useQueryClient();
+
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: queryKeys.interview(interviewID),
     queryFn: () => getInterview(interviewID),
   });
+
   const interview = data?.interview;
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteInterview(interviewID),
+
     onSuccess: () => {
       Toast.show({
         type: 'success',
         text1: 'Interview Deleted',
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.interviews });
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.interviews,
+      });
 
       if (interview?.jobID) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.jobInterviews(interview.jobID),
         });
       }
+
       queryClient.removeQueries({
         queryKey: queryKeys.interview(interviewID),
       });
+
       navigation.goBack();
     },
 

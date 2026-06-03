@@ -1,28 +1,37 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, typography } from '../../theme/theme';
+
 import Card from './Card';
+import { colors, radius, spacing, typography } from '../../theme/theme';
 
 const startOfWeek = date => {
   const d = new Date(date);
   const day = d.getDay();
   const diff = d.getDate() - day;
+
   d.setDate(diff);
   d.setHours(0, 0, 0, 0);
+
   return d;
 };
 
 const toDateKey = date => {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
-    date.getDate()
-  ).padStart(2, '0')}`;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 };
 
 const interviewDateKey = isoString => {
   if (!isoString) return '';
-  const d = new Date(isoString);
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(
-    d.getUTCDate()
-  ).padStart(2, '0')}`;
+
+  const date = new Date(isoString);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 };
 
 export default function HomeWeekCalendar({ interviews = [] }) {
@@ -30,28 +39,42 @@ export default function HomeWeekCalendar({ interviews = [] }) {
   const weekStart = startOfWeek(today);
 
   const days = Array.from({ length: 7 }).map((_, index) => {
-    const d = new Date(weekStart);
-    d.setDate(weekStart.getDate() + index);
-    const key = toDateKey(d);
+    const date = new Date(weekStart);
+
+    date.setDate(weekStart.getDate() + index);
+
+    const key = toDateKey(date);
 
     return {
       key,
-      date: d,
-      dayName: d.toLocaleDateString(undefined, { weekday: 'short' }),
-      dayNumber: d.getDate(),
+      date,
+      dayName: date.toLocaleDateString(undefined, { weekday: 'short' }),
+      dayNumber: date.getDate(),
       isToday: key === toDateKey(today),
-      interviews: interviews.filter(item => interviewDateKey(item.interviewDate) === key),
+      interviews: interviews.filter(
+        item => interviewDateKey(item.interviewDate) === key
+      ),
     };
   });
 
   return (
     <Card>
       <Text style={styles.heading}>This Week</Text>
+
       <View style={styles.weekGrid}>
         {days.map(day => (
-          <View key={day.key} style={[styles.dayCard, day.isToday && styles.todayCard]}>
-            <Text style={[styles.dayName, day.isToday && styles.todayText]}>{day.dayName}</Text>
-            <Text style={[styles.dayNumber, day.isToday && styles.todayText]}>{day.dayNumber}</Text>
+          <View
+            key={day.key}
+            style={[styles.dayCard, day.isToday && styles.todayCard]}
+          >
+            <Text style={[styles.dayName, day.isToday && styles.todayText]}>
+              {day.dayName}
+            </Text>
+
+            <Text style={[styles.dayNumber, day.isToday && styles.todayText]}>
+              {day.dayNumber}
+            </Text>
+
             <View style={styles.dotRow}>
               {day.interviews.length > 0 ? <View style={styles.dot} /> : null}
             </View>
@@ -67,14 +90,18 @@ export default function HomeWeekCalendar({ interviews = [] }) {
                 <Text style={styles.interviewTitle}>
                   {interview.companyName} — {interview.jobTitle}
                 </Text>
+
                 <Text style={styles.interviewMeta}>
-                  {day.dayName} • {interview.interviewType} • {interview.result}
+                  {day.dayName} • {interview.interviewType} •{' '}
+                  {interview.result}
                 </Text>
               </View>
             ))
           )
         ) : (
-          <Text style={styles.noInterviews}>No interviews scheduled this week.</Text>
+          <Text style={styles.noInterviews}>
+            No interviews scheduled this week.
+          </Text>
         )}
       </View>
     </Card>

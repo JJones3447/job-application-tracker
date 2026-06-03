@@ -8,14 +8,17 @@ export default function mapInterviewErrors(details = []) {
       fieldErrors.interviewDate = message;
       return;
     }
+
     if (lower.includes('type')) {
       fieldErrors.interviewType = message;
       return;
     }
+
     if (lower.includes('result')) {
       fieldErrors.result = message;
       return;
     }
+
     if (lower.includes('notes')) {
       fieldErrors.interviewNotes = message;
       return;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+
 import AppButton from '../../../common/AppButton';
 import Card from '../../../common/Card';
 import { colors, radius, spacing, typography } from '../../../../theme/theme';
@@ -26,6 +27,7 @@ export default function AuthForm({
 
   const validate = () => {
     const newErrors = {};
+
     if (isRegister) {
       if (!formData.name?.trim()) {
         newErrors.name = 'Name is required.';
@@ -56,8 +58,14 @@ export default function AuthForm({
       setLocalErrors(validationErrors);
       return;
     }
+
     setLocalErrors({});
-    onSubmit(formData);
+
+    onSubmit({
+      ...formData,
+      name: formData.name?.trim(),
+      email: formData.email?.trim(),
+    });
   };
 
   const combinedErrors = {
@@ -112,9 +120,11 @@ export default function AuthForm({
         />
         {renderError('password')}
       </View>
+
       {combinedErrors.general ? (
         <Text style={styles.generalError}>{combinedErrors.general}</Text>
       ) : null}
+
       <AppButton
         title={loading ? 'Submitting...' : submitLabel}
         onPress={handleSubmit}

@@ -1,10 +1,12 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+
 import { colors, spacing, typography } from '../../theme/theme';
 
 export default function LoadingState({ message = 'Loading...' }) {
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color={colors.green} />
+
       <Text style={styles.text}>{message}</Text>
     </View>
   );

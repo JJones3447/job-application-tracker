@@ -1,5 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-import { colors, radius, spacing, typography } from '../../theme/theme'
+
+import { colors, radius, spacing, typography } from '../../theme/theme';
 
 export default function AppButton({
   title,
@@ -10,6 +11,7 @@ export default function AppButton({
   fullWidth = true,
 }) {
   const isDisabled = disabled || loading;
+  const indicatorColor = variant === 'secondary' ? colors.green : colors.black;
 
   return (
     <Pressable
@@ -25,8 +27,8 @@ export default function AppButton({
         pressed && !isDisabled && styles.pressed,
       ]}
     >
-        {loading ? (
-        <ActivityIndicator color={variant === 'secondary' ? colors.green : colors.black} />
+      {loading ? (
+        <ActivityIndicator color={indicatorColor} />
       ) : (
         <Text
           style={[

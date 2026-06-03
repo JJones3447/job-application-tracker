@@ -8,10 +8,12 @@ export default function mapAuthErrors(details = []) {
       fieldErrors.name = message;
       return;
     }
+
     if (lower.includes('email')) {
       fieldErrors.email = message;
       return;
     }
+
     if (lower.includes('password')) {
       fieldErrors.password = message;
       return;

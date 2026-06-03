@@ -1,5 +1,6 @@
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
+
 import { colors, radius, spacing, typography } from '../../../theme/theme';
 
 export default function FormSelect({
@@ -14,6 +15,7 @@ export default function FormSelect({
   return (
     <View style={styles.container}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
+
       <RNPickerSelect
         value={value}
         onValueChange={onChange}

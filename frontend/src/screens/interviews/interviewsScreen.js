@@ -1,15 +1,21 @@
-import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useEffect } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { getInterviews } from '../../api';
 import Toast from 'react-native-toast-message';
+
+import { getInterviews } from '../../api';
 import { queryKeys } from '../../api/queryKeys';
-import { formatDateTime } from '../../utils/dateUtils';
 import AppScreen from '../../components/common/AppScreen';
 import Card from '../../components/common/Card';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingState from '../../components/common/LoadingState';
-import { colors, spacing, typography, getInterviewResultColor } from '../../theme/theme';
+import {
+  colors,
+  getInterviewResultColor,
+  spacing,
+  typography,
+} from '../../theme/theme';
+import { formatDateTime } from '../../utils/dateUtils';
 
 export default function InterviewsScreen({ navigation }) {
   const { data, isLoading, error } = useQuery({
@@ -54,9 +60,7 @@ export default function InterviewsScreen({ navigation }) {
         <Text style={styles.cardSubtitle}>{item.jobTitle}</Text>
 
         <View style={styles.metaRow}>
-          <Text style={styles.badge}>
-            {item.interviewType || 'Interview'}
-          </Text>
+          <Text style={styles.badge}>{item.interviewType || 'Interview'}</Text>
 
           <Text
             style={[

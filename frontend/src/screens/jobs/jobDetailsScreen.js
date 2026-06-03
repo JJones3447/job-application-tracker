@@ -1,31 +1,33 @@
+import { useState } from 'react';
 import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Platform,
   FlatList,
   Linking,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useState } from 'react';
-import { getJob, getInterviewsForJob, deleteJob } from '../../api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { deleteJob, getInterviewsForJob, getJob } from '../../api';
 import { queryKeys } from '../../api/queryKeys';
-import handleApiError from '../../utils/handleApiError';
-import ConfirmModal from '../../components/common/confirmModal';
-import { formatDate, formatDateTime } from '../../utils/dateUtils';
 import AppButton from '../../components/common/AppButton';
 import AppScreen from '../../components/common/AppScreen';
 import Card from '../../components/common/Card';
+import ConfirmModal from '../../components/common/confirmModal';
 import EmptyState from '../../components/common/EmptyState';
 import ErrorState from '../../components/common/ErrorState';
 import LoadingState from '../../components/common/LoadingState';
 import { colors, spacing, typography } from '../../theme/theme';
+import handleApiError from '../../utils/handleApiError';
+import { formatDate, formatDateTime } from '../../utils/dateUtils';
 
 export default function JobDetailsScreen({ route, navigation }) {
   const { jobID } = route.params;
   const queryClient = useQueryClient();
+
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   const {
@@ -54,16 +56,22 @@ export default function JobDetailsScreen({ route, navigation }) {
         type: 'success',
         text1: 'Job Deleted',
       });
+
       queryClient.invalidateQueries({
         queryKey: queryKeys.jobs,
       });
+
       queryClient.removeQueries({
         queryKey: queryKeys.job(jobID),
       });
+
       queryClient.removeQueries({
         queryKey: queryKeys.jobInterviews(jobID),
       });
-      navigation.navigate('Jobs');
+
+      navigation.navigate('MainTabs', {
+        screen: 'Jobs',
+      });
     },
 
     onError: error => {
@@ -129,9 +137,7 @@ export default function JobDetailsScreen({ route, navigation }) {
         </Text>
 
         <Text style={styles.interviewDate}>
-          {item.interviewDate
-            ? formatDateTime(item.interviewDate)
-            : 'No date'}
+          {item.interviewDate ? formatDateTime(item.interviewDate) : 'No date'}
         </Text>
       </View>
     </Pressable>
@@ -149,9 +155,7 @@ export default function JobDetailsScreen({ route, navigation }) {
         </View>
 
         <View style={styles.detailsGrid}>
-          {job.location ? (
-            <Detail label="Location" value={job.location} />
-          ) : null}
+          {job.location ? <Detail label="Location" value={job.location} /> : null}
 
           <Detail label="Listed Salary" value={job.listedSalary || '-'} />
 
@@ -160,18 +164,12 @@ export default function JobDetailsScreen({ route, navigation }) {
           ) : null}
 
           {job.applicationDate ? (
-            <Detail
-              label="Applied On"
-              value={formatDate(job.applicationDate)}
-            />
+            <Detail label="Applied On" value={formatDate(job.applicationDate)} />
           ) : null}
         </View>
 
         {job.jobURL ? (
-          <Pressable
-            onPress={() => openUrl(job.jobURL)}
-            style={styles.linkBox}
-          >
+          <Pressable onPress={() => openUrl(job.jobURL)} style={styles.linkBox}>
             <Text style={styles.linkLabel}>Job URL</Text>
             <Text style={styles.linkValue} numberOfLines={2}>
               {job.jobURL}
@@ -189,6 +187,7 @@ export default function JobDetailsScreen({ route, navigation }) {
 
       <Card>
         <Text style={styles.sectionTitle}>Interviews</Text>
+
         <FlatList
           data={interviews}
           keyExtractor={item => item.interviewID.toString()}
@@ -201,6 +200,7 @@ export default function JobDetailsScreen({ route, navigation }) {
             />
           }
         />
+
         <AppButton
           title="Add Interview"
           onPress={() =>
@@ -211,6 +211,7 @@ export default function JobDetailsScreen({ route, navigation }) {
           variant="secondary"
         />
       </Card>
+
       <View style={styles.actions}>
         <AppButton
           title="Edit Job"
@@ -220,6 +221,7 @@ export default function JobDetailsScreen({ route, navigation }) {
             })
           }
         />
+
         <AppButton
           title={deleteMutation.isPending ? 'Deleting...' : 'Delete Job'}
           variant="danger"
@@ -228,6 +230,7 @@ export default function JobDetailsScreen({ route, navigation }) {
           disabled={deleteMutation.isPending}
         />
       </View>
+
       <ConfirmModal
         visible={confirmVisible}
         title="Delete Job"

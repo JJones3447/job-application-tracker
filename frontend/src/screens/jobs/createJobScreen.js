@@ -1,32 +1,35 @@
-import { View } from 'react-native';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createJob } from '../../api';
-import JobForm from '../../components/forms/domains/jobs/jobForm';
-import mapBackendErrors from '../../utils/mapBackendErrors';
-import handleApiError from '../../utils/handleApiError';
 import Toast from 'react-native-toast-message';
+
+import { createJob } from '../../api';
 import { queryKeys } from '../../api/queryKeys';
-import { getTodayString } from '../../utils/dateUtils';
 import AppScreen from '../../components/common/AppScreen';
+import JobForm from '../../components/forms/domains/jobs/jobForm';
+import { getTodayString } from '../../utils/dateUtils';
+import handleApiError from '../../utils/handleApiError';
+import mapBackendErrors from '../../utils/mapBackendErrors';
 
 export default function CreateJobScreen({ navigation }) {
-  const [errors, setErrors] = useState({});
   const queryClient = useQueryClient();
+  const [errors, setErrors] = useState({});
 
   const createJobMutation = useMutation({
     mutationFn: createJob,
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobs });
+
       Toast.show({
         type: 'success',
         text1: 'Job Created',
         text2: 'Your job was added successfully.',
       });
+
       navigation.goBack();
     },
 
-    onError: (error) => {
+    onError: error => {
       handleApiError(error, setErrors, mapBackendErrors);
     },
   });

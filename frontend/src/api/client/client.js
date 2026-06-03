@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { getAuthToken } from './tokenStorage';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -15,7 +16,6 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(config => {
   const token = getAuthToken();
-  
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -26,7 +26,7 @@ apiClient.interceptors.request.use(config => {
 
 apiClient.interceptors.response.use(
   response => response,
-  async error => {
+  error => {
     const status = error.response?.status;
     const message = error.response?.data?.error?.message;
 

@@ -1,6 +1,14 @@
 import { useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, TextInput, View,} from 'react-native';
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+
 import { colors, radius, spacing, typography } from '../../../theme/theme';
 
 const formatLocalDate = date => {

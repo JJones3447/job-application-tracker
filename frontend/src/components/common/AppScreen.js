@@ -1,4 +1,11 @@
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
+
 import { colors, spacing } from '../../theme/theme';
 
 export default function AppScreen({ children, scroll = true, padded = true }) {

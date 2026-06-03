@@ -1,14 +1,15 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+
 import AppButton from '../../../common/AppButton';
 import Card from '../../../common/Card';
-import FormField from '../formField';
 import FormDatePicker from '../formDatePicker';
+import FormField from '../formField';
 import FormSelect from '../formSelect';
 import {
-  INTERVIEW_TYPES,
-  INTERVIEW_RESULTS,
   HOUR_OPTIONS,
+  INTERVIEW_RESULTS,
+  INTERVIEW_TYPES,
   MINUTE_OPTIONS,
   PERIOD_OPTIONS,
 } from '../../../../constants/formOptions';
@@ -20,12 +21,19 @@ const buildISODate = (date, hour, minute, period) => {
 
   const [year, month, day] = date.split('-').map(Number);
 
-  let h = parseInt(hour, 10);
+  let parsedHour = parseInt(hour, 10);
 
-  if (period === 'PM' && h !== 12) h += 12;
-  if (period === 'AM' && h === 12) h = 0;
+  if (period === 'PM' && parsedHour !== 12) parsedHour += 12;
+  if (period === 'AM' && parsedHour === 12) parsedHour = 0;
 
-  const localDate = new Date(year, month - 1, day, h, Number(minute), 0);
+  const localDate = new Date(
+    year,
+    month - 1,
+    day,
+    parsedHour,
+    Number(minute),
+    0
+  );
 
   return localDate.toISOString().replace('.000Z', 'Z');
 };
@@ -34,10 +42,11 @@ const extractDate = isoString => {
   if (!isoString) return '';
 
   const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
 
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
-    date.getDate()
-  ).padStart(2, '0')}`;
+  return `${year}-${month}-${day}`;
 };
 
 const extractTime = isoString => {
@@ -70,7 +79,11 @@ const isValidDate = value => {
 const interviewValidators = {
   date: value => {
     if (!value) return 'Interview date is required.';
-    if (!isValidDate(value)) return 'Interview date must use YYYY-MM-DD format.';
+
+    if (!isValidDate(value)) {
+      return 'Interview date must use YYYY-MM-DD format.';
+    }
+
     return undefined;
   },
 
@@ -78,7 +91,10 @@ const interviewValidators = {
     const validTypes = INTERVIEW_TYPES.map(option => option.value);
 
     if (!value) return 'Interview type is required.';
-    if (!validTypes.includes(value)) return 'Please select a valid interview type.';
+
+    if (!validTypes.includes(value)) {
+      return 'Please select a valid interview type.';
+    }
 
     return undefined;
   },
@@ -102,13 +118,13 @@ const interviewValidators = {
   },
 };
 
-const InterviewForm = ({
+export default function InterviewForm({
   onSubmit,
   initialValues = {},
   submitLabel,
   loading = false,
   errors = {},
-}) => {
+}) {
   const {
     formData,
     resetForm,
@@ -138,6 +154,7 @@ const InterviewForm = ({
 
     if (initialValues.interviewDate) {
       date = extractDate(initialValues.interviewDate);
+
       const time = extractTime(initialValues.interviewDate);
 
       hour = time.hour;
@@ -225,6 +242,7 @@ const InterviewForm = ({
         items={INTERVIEW_TYPES}
         error={shouldShowError('interviewType') || combinedErrors.interviewType}
       />
+
       <FormSelect
         label="Result"
         value={formData.result}
@@ -233,6 +251,7 @@ const InterviewForm = ({
         items={INTERVIEW_RESULTS}
         error={shouldShowError('result') || combinedErrors.result}
       />
+
       <FormField
         label="Notes"
         value={formData.interviewNotes}
@@ -240,7 +259,9 @@ const InterviewForm = ({
         onBlur={() => handleBlur('interviewNotes')}
         multiline
         placeholder="Add interview notes..."
-        error={shouldShowError('interviewNotes') || combinedErrors.interviewNotes}
+        error={
+          shouldShowError('interviewNotes') || combinedErrors.interviewNotes
+        }
       />
 
       {combinedErrors.general ? (
@@ -255,7 +276,7 @@ const InterviewForm = ({
       />
     </Card>
   );
-};
+}
 
 const styles = StyleSheet.create({
   timeRow: {
@@ -271,5 +292,3 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
 });
-
-export default InterviewForm;

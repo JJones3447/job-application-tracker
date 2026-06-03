@@ -1,17 +1,19 @@
-import { createContext, useEffect, useState, useCallback } from 'react';
-import { login as loginApi, getMe } from '../api/auth/authApi';
+import { createContext, useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { getMe, login as loginApi } from '../api/auth/authApi';
 import { setLogoutHandler } from '../api/client/client';
 import {
+  clearAuthToken,
   loadStoredToken,
   setAuthToken,
-  clearAuthToken,
 } from '../api/client/tokenStorage';
-import { useQueryClient } from '@tanstack/react-query';
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const queryClient = useQueryClient();
+
   const [userToken, setUserToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authenticating, setAuthenticating] = useState(false);
@@ -70,6 +72,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     setLogoutHandler(logout);
   }, [logout]);
+
   useEffect(() => {
     checkAuth();
   }, []);

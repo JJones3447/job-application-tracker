@@ -1,10 +1,10 @@
 import { Platform } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import HomeScreen from '../screens/homeScreen';
-import JobsScreen from '../screens/jobs/jobsScreen';
 import InterviewsScreen from '../screens/interviews/interviewsScreen';
+import JobsScreen from '../screens/jobs/jobsScreen';
 import { colors } from '../theme/theme';
 
 const Tab = createBottomTabNavigator();
@@ -34,7 +34,6 @@ export default function MainTabs() {
         },
         tabBarActiveTintColor: colors.green,
         tabBarInactiveTintColor: colors.textMuted,
-
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
 
@@ -46,28 +45,13 @@ export default function MainTabs() {
             iconName = focused ? 'people' : 'people-outline';
           }
 
-          return (
-            <Ionicons
-              name={iconName}
-              size={size}
-              color={color}
-            />
-          );
+          return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
     >
-      <Tab.Screen
-        name="Dashboard"
-        component={HomeScreen}
-      />
-      <Tab.Screen
-        name="Jobs"
-        component={JobsScreen}
-      />
-      <Tab.Screen
-        name="Interviews"
-        component={InterviewsScreen}
-      />
+      <Tab.Screen name="Dashboard" component={HomeScreen} />
+      <Tab.Screen name="Jobs" component={JobsScreen} />
+      <Tab.Screen name="Interviews" component={InterviewsScreen} />
     </Tab.Navigator>
   );
 }

@@ -1,12 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, spacing, typography } from '../../theme/theme';
+
 import AppButton from './AppButton';
+import { colors, spacing, typography } from '../../theme/theme';
 
 export default function EmptyState({ title, message, actionLabel, onAction }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
+
       {message ? <Text style={styles.message}>{message}</Text> : null}
+
       {actionLabel && onAction ? (
         <AppButton title={actionLabel} onPress={onAction} variant="secondary" />
       ) : null}

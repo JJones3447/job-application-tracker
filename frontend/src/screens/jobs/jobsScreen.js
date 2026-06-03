@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet, TextInput } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { getJobs } from '../../api';
 import Toast from 'react-native-toast-message';
+
+import { getJobs } from '../../api';
 import { queryKeys } from '../../api/queryKeys';
 import AppButton from '../../components/common/AppButton';
 import AppScreen from '../../components/common/AppScreen';
 import Card from '../../components/common/Card';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingState from '../../components/common/LoadingState';
-import { colors, spacing, typography, getJobStatusColor }from '../../theme/theme'
+import {
+  colors,
+  getJobStatusColor,
+  spacing,
+  typography,
+} from '../../theme/theme';
 import { formatDate } from '../../utils/dateUtils';
 
 export default function JobsScreen({ navigation }) {
@@ -31,10 +37,9 @@ export default function JobsScreen({ navigation }) {
   }, [error]);
 
   const jobs = data?.jobs || [];
+  const search = searchTerm.trim().toLowerCase();
 
   const filteredJobs = jobs.filter(job => {
-    const search = searchTerm.trim().toLowerCase();
-
     if (!search) return true;
 
     const searchableText = [
@@ -137,7 +142,9 @@ export default function JobsScreen({ navigation }) {
                 : 'Create your first job entry to begin tracking applications.'
             }
             actionLabel={searchTerm ? undefined : 'Add Job'}
-            onAction={searchTerm ? undefined : () => navigation.navigate('CreateJob')}
+            onAction={
+              searchTerm ? undefined : () => navigation.navigate('CreateJob')
+            }
           />
         }
       />

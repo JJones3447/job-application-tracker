@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+
 import { colors, radius, shadows, spacing } from '../../theme/theme';
 
 export default function Card({ children, style }) {

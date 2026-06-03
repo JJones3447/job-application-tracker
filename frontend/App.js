@@ -1,9 +1,10 @@
 import { useContext } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import AppNavigator from './src/navigation/appNavigator';
-import { AuthProvider, AuthContext } from './src/context/authContext';
-import Toast from 'react-native-toast-message';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
+
+import { AuthContext, AuthProvider } from './src/context/authContext';
+import AppNavigator from './src/navigation/appNavigator';
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ function Root() {
     <>
       <AppNavigator />
       <Toast />
+
       {authenticating && (
         <View style={styles.overlay}>
           <ActivityIndicator size="large" color="#fff" />
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },

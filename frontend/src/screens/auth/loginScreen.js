@@ -1,11 +1,12 @@
-import { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { AuthContext } from '../../context/authContext';
-import AuthForm from '../../components/forms/domains/auth/authForm';
-import mapAuthErrors from '../../utils/mapAuthErrors';
-import handleApiError from '../../utils/handleApiError';
-import { colors, spacing, typography } from '../../theme/theme';
+import { useContext, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+
 import AppScreen from '../../components/common/AppScreen';
+import AuthForm from '../../components/forms/domains/auth/authForm';
+import { AuthContext } from '../../context/authContext';
+import handleApiError from '../../utils/handleApiError';
+import mapAuthErrors from '../../utils/mapAuthErrors';
+import { colors, spacing, typography } from '../../theme/theme';
 
 export default function LoginScreen({ navigation }) {
   const { login, authenticating } = useContext(AuthContext);
@@ -16,7 +17,7 @@ export default function LoginScreen({ navigation }) {
     password: '',
   };
 
-  const handleLogin = async (formData) => {
+  const handleLogin = async formData => {
     try {
       setErrors({});
       await login(formData.email, formData.password);
@@ -49,9 +50,7 @@ export default function LoginScreen({ navigation }) {
         style={styles.linkContainer}
         onPress={() => navigation.navigate('Register')}
       >
-        <Text style={styles.link}>
-          Don’t have an account? Register
-        </Text>
+        <Text style={styles.link}>Don’t have an account? Register</Text>
       </Pressable>
     </AppScreen>
   );

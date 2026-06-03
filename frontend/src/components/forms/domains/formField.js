@@ -1,8 +1,8 @@
-import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+
 import { colors, radius, spacing, typography } from '../../../theme/theme';
 
-const FormField = ({
+export default function FormField({
   label,
   value,
   onChange,
@@ -13,10 +13,11 @@ const FormField = ({
   autoCapitalize = 'sentences',
   secureTextEntry = false,
   placeholder,
-}) => {
+}) {
   return (
     <View style={styles.container}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
+
       <TextInput
         style={[
           styles.input,
@@ -37,7 +38,7 @@ const FormField = ({
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -73,5 +74,3 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
 });
-
-export default FormField;

@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, Text } from 'react-native';
+
 import AppButton from '../../../common/AppButton';
 import Card from '../../../common/Card';
-import FormField from '../formField';
 import FormDatePicker from '../formDatePicker';
+import FormField from '../formField';
 import FormSelect from '../formSelect';
 import { JOB_STATUS_OPTIONS } from '../../../../constants/formOptions';
 import useFormValidation from '../../../../hooks/useFormValidation';
@@ -32,38 +33,59 @@ const isValidDate = value => {
 const jobValidators = {
   companyName: value => {
     if (!value?.trim()) return 'Company name is required.';
-    if (value.trim().length > 100) return 'Company name cannot exceed 100 characters.';
+
+    if (value.trim().length > 100) {
+      return 'Company name cannot exceed 100 characters.';
+    }
+
     return undefined;
   },
 
   jobTitle: value => {
     if (!value?.trim()) return 'Job title is required.';
-    if (value.trim().length > 100) return 'Job title cannot exceed 100 characters.';
+
+    if (value.trim().length > 100) {
+      return 'Job title cannot exceed 100 characters.';
+    }
+
     return undefined;
   },
 
   listedSalary: value => {
-    if (value && value.length > 50) return 'Listed salary cannot exceed 50 characters.';
+    if (value && value.length > 50) {
+      return 'Listed salary cannot exceed 50 characters.';
+    }
+
     return undefined;
   },
 
   location: value => {
-    if (value && value.length > 100) return 'Location cannot exceed 100 characters.';
+    if (value && value.length > 100) {
+      return 'Location cannot exceed 100 characters.';
+    }
+
     return undefined;
   },
 
   technologies: value => {
-    if (value && typeof value !== 'string') return 'Technologies must be text.';
+    if (value && typeof value !== 'string') {
+      return 'Technologies must be text.';
+    }
+
     return undefined;
   },
 
   jobURL: value => {
     if (!isValidUrl(value)) return 'Job URL must be a valid URL.';
+
     return undefined;
   },
 
   applicationDate: value => {
-    if (!isValidDate(value)) return 'Application date must use YYYY-MM-DD format.';
+    if (!isValidDate(value)) {
+      return 'Application date must use YYYY-MM-DD format.';
+    }
+
     return undefined;
   },
 
@@ -78,18 +100,21 @@ const jobValidators = {
   },
 
   notes: value => {
-    if (value && typeof value !== 'string') return 'Notes must be text.';
+    if (value && typeof value !== 'string') {
+      return 'Notes must be text.';
+    }
+
     return undefined;
   },
 };
 
-const JobForm = ({
+export default function JobForm({
   onSubmit,
   initialValues = {},
   submitLabel,
   loading = false,
   errors = {},
-}) => {
+}) {
   const {
     formData,
     resetForm,
@@ -159,6 +184,7 @@ const JobForm = ({
         placeholder="Company name"
         error={shouldShowError('companyName') || combinedErrors.companyName}
       />
+
       <FormField
         label="Job Title"
         value={formData.jobTitle}
@@ -167,6 +193,7 @@ const JobForm = ({
         placeholder="Software Engineer"
         error={shouldShowError('jobTitle') || combinedErrors.jobTitle}
       />
+
       <FormField
         label="Listed Salary"
         value={formData.listedSalary}
@@ -175,6 +202,7 @@ const JobForm = ({
         placeholder="$80,000 - $100,000"
         error={shouldShowError('listedSalary') || combinedErrors.listedSalary}
       />
+
       <FormField
         label="Location"
         value={formData.location}
@@ -183,6 +211,7 @@ const JobForm = ({
         placeholder="Remote, Chicago, IL, etc."
         error={shouldShowError('location') || combinedErrors.location}
       />
+
       <FormField
         label="Technologies"
         value={formData.technologies}
@@ -191,6 +220,7 @@ const JobForm = ({
         placeholder="React, Node.js, MySQL"
         error={shouldShowError('technologies') || combinedErrors.technologies}
       />
+
       <FormField
         label="Job URL"
         value={formData.jobURL}
@@ -201,12 +231,16 @@ const JobForm = ({
         placeholder="https://example.com/job-posting"
         error={shouldShowError('jobURL') || combinedErrors.jobURL}
       />
+
       <FormDatePicker
         label="Application Date"
         value={formData.applicationDate}
         onChange={value => handleChange('applicationDate', value)}
-        error={shouldShowError('applicationDate') || combinedErrors.applicationDate}
+        error={
+          shouldShowError('applicationDate') || combinedErrors.applicationDate
+        }
       />
+
       <FormSelect
         label="Status"
         value={formData.status}
@@ -215,6 +249,7 @@ const JobForm = ({
         items={JOB_STATUS_OPTIONS}
         error={shouldShowError('status') || combinedErrors.status}
       />
+
       <FormField
         label="Notes"
         value={formData.notes}
@@ -224,9 +259,11 @@ const JobForm = ({
         placeholder="Add notes about the role..."
         error={shouldShowError('notes') || combinedErrors.notes}
       />
+
       {combinedErrors.general ? (
         <Text style={styles.generalError}>{combinedErrors.general}</Text>
       ) : null}
+
       <AppButton
         title={loading ? 'Submitting...' : submitLabel}
         onPress={handleSubmit}
@@ -235,7 +272,7 @@ const JobForm = ({
       />
     </Card>
   );
-};
+}
 
 const styles = StyleSheet.create({
   generalError: {
@@ -244,5 +281,3 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
 });
-
-export default JobForm;

@@ -8,15 +8,19 @@ export default function useFormValidation(initialState, validators = {}) {
 
   const validateField = (field, value, allValues = formData) => {
     const validator = validators[field];
+
     if (!validator) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
       return true;
     }
+
     const message = validator(value, allValues);
+
     setErrors(prev => ({
       ...prev,
       [field]: message || undefined,
     }));
+
     return !message;
   };
 
@@ -25,7 +29,9 @@ export default function useFormValidation(initialState, validators = {}) {
       ...formData,
       [field]: value,
     };
+
     setFormData(nextData);
+
     if (touched[field] || isSubmitted) {
       validateField(field, value, nextData);
     }
@@ -42,16 +48,21 @@ export default function useFormValidation(initialState, validators = {}) {
 
   const validateForm = () => {
     setIsSubmitted(true);
+
     let isValid = true;
     const nextErrors = {};
+
     Object.keys(validators).forEach(field => {
       const message = validators[field](formData[field], formData);
+
       if (message) {
         nextErrors[field] = message;
         isValid = false;
       }
     });
+
     setErrors(nextErrors);
+
     return isValid;
   };
 

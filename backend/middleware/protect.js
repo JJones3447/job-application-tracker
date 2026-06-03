@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 const AppError = require('../utils/appError');
 
 module.exports = (req, res, next) => {
-    let token;
+  let token;
 
-    if (
+  if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer ')
   ) {
@@ -20,7 +20,7 @@ module.exports = (req, res, next) => {
 
     req.user = {
       userID: decoded.userID,
-      email: decoded.email
+      email: decoded.email,
     };
 
     next();

@@ -1,25 +1,21 @@
 const express = require('express');
-const router = express.Router();
-const protect = require('../middleware/protect');
 
 const {
-  getJobs,
-  getJob,
   createJob,
-  updateJob,
   deleteJob,
+  getJob,
+  getJobs,
+  updateJob,
 } = require('../controllers/jobController');
-const {validateJob} = require('../middleware/validateInput');
+const protect = require('../middleware/protect');
+const { validateJob } = require('../middleware/validateInput');
+
+const router = express.Router();
 
 router.use(protect);
 
-router.route('/')
-  .get(getJobs)
-  .post(validateJob, createJob);
+router.route('/').get(getJobs).post(validateJob, createJob);
 
-router.route('/:id')
-  .get(getJob)
-  .put(validateJob, updateJob)
-  .delete(deleteJob);
+router.route('/:id').get(getJob).put(validateJob, updateJob).delete(deleteJob);
 
 module.exports = router;

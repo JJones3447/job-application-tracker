@@ -1,4 +1,5 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+
 import AppButton from './AppButton';
 import { colors, radius, shadows, spacing, typography } from '../../theme/theme';
 
@@ -20,7 +21,10 @@ export default function ConfirmModal({
       onRequestClose={onCancel}
     >
       <Pressable style={styles.backdrop} onPress={onCancel}>
-        <Pressable style={styles.card} onPress={event => event.stopPropagation()}>
+        <Pressable
+          style={styles.card}
+          onPress={event => event.stopPropagation()}
+        >
           <Text style={styles.title}>{title}</Text>
 
           {message ? <Text style={styles.message}>{message}</Text> : null}
@@ -53,7 +57,7 @@ export default function ConfirmModal({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.72)',
+    backgroundColor: 'rgba(0, 0, 0, 0.72)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.lg,

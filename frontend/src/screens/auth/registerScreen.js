@@ -1,11 +1,12 @@
-import { useState, useContext } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { useContext, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
 import { register } from '../../api';
-import AuthForm from '../../components/forms/domains/auth/authForm';
-import mapAuthErrors from '../../utils/mapAuthErrors';
-import handleApiError from '../../utils/handleApiError';
-import { AuthContext } from '../../context/authContext';
 import AppScreen from '../../components/common/AppScreen';
+import AuthForm from '../../components/forms/domains/auth/authForm';
+import { AuthContext } from '../../context/authContext';
+import handleApiError from '../../utils/handleApiError';
+import mapAuthErrors from '../../utils/mapAuthErrors';
 import { colors, spacing, typography } from '../../theme/theme';
 
 export default function RegisterScreen() {
@@ -18,7 +19,7 @@ export default function RegisterScreen() {
     password: '',
   };
 
-  const handleRegister = async (formData) => {
+  const handleRegister = async formData => {
     try {
       setErrors({});
       await register(formData);

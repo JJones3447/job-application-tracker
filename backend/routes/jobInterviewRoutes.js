@@ -1,15 +1,19 @@
 const express = require('express');
-const router = express.Router({ mergeParams: true });
-const protect = require('../middleware/protect');
+
 const {
-  getInterviewsByJob,
   createInterviewForJob,
+  getInterviewsByJob,
 } = require('../controllers/interviewController');
-const {validateInterview} = require('../middleware/validateInput');
+const protect = require('../middleware/protect');
+const { validateInterview } = require('../middleware/validateInput');
+
+const router = express.Router({ mergeParams: true });
 
 router.use(protect);
 
-router.route('/')
+router
+  .route('/')
   .get(getInterviewsByJob)
   .post(validateInterview, createInterviewForJob);
+
 module.exports = router;
