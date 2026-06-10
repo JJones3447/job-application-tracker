@@ -56,7 +56,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <AppScreen>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>Job Search Tracker</Text>
+        <Text style={styles.eyebrow}>Job Application Tracker</Text>
         <Text style={styles.title}>Welcome</Text>
         <Text style={styles.subtitle}>
           Track applications, interviews, and progress in one place.
