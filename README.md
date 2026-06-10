@@ -6,9 +6,11 @@
 
 A full-stack job application tracking platform designed to help users manage applications, interviews, and hiring progress in one centralized system.
 
-This project was created to strengthen and demonstrate full-stack software engineering skills, including authentication, REST API design, database integration, cross-platform frontend development, and state management.
+The frontend communicates with a custom REST API built with Express.js, while MySQL is used for persistent relational data storage and JWT-based authentication secures protected routes.
 
-The application supports both mobile and web platforms using React Native with Expo and includes a Node.js + Express backend with MySQL for persistent data storage.
+This project was designed to strengthen and demonstrate full-stack software engineering skills, including authentication, REST API design, database integration, cross-platform frontend development, and state management.
+
+The application supports both mobile and web platforms using React Native with Expo.
 
 ---
 
@@ -17,6 +19,18 @@ The application supports both mobile and web platforms using React Native with E
 I built this project to strengthen my full-stack software engineering skills while creating a practical application that I could use personally during my job search.
 
 The project focuses on backend API development, authentication, database design, frontend architecture, reusable components, state management, and cross-platform mobile/web support using React Native and Expo.
+
+---
+
+## Technical Highlights
+
+* Built a full-stack React Native + Node.js application from scratch
+* Designed and implemented a RESTful API with JWT authentication
+* Created reusable form and UI component systems
+* Implemented protected routes and centralized validation middleware
+* Managed server state and caching using TanStack React Query
+* Designed a relational MySQL database with normalized relationships
+* Developed responsive cross-platform interfaces for web and mobile
 
 ---
 
@@ -42,6 +56,10 @@ The project focuses on backend API development, authentication, database design,
 
 ## Tech Stack
 
+### Language
+
+* JavaScript
+
 ### Frontend
 
 * React Native
@@ -55,13 +73,12 @@ The project focuses on backend API development, authentication, database design,
 
 * Node.js
 * Express.js
-* JavaScript
+* JWT Authentication
 * bcrypt
 
 ### Database
 
 * MySQL
-* mysql2
 
 ---
 
@@ -310,8 +327,41 @@ This relational structure allows secure user-specific data ownership while suppo
 
 ## Screenshots
 
-Screenshots coming soon.
+### Login Screen
 
+![Login Screen](./screenshots/login-screen.png)
+
+---
+
+### Dashboard
+
+![Dashboard](./screenshots/dashboard.png)
+
+---
+
+### Jobs Screen
+
+![Jobs Screen](./screenshots/jobs-screen.png)
+
+---
+
+### Job Details
+
+![Job Details Part 1](./screenshots/job-details1.png)
+
+![Job Details Part 2](./screenshots/job-details2.png)
+
+---
+
+### Interviews Screen
+
+![Interviews Screen](./screenshots/interviews-screen.png)
+
+---
+
+### Interview Details
+
+![Interview Details](./screenshots/interview-details.png)
 
 ---
 
